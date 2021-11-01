@@ -49,20 +49,38 @@ services:
     networks:
       - backend
       - user-postgres
-  # PGADMIN
-  pgadmin:
+
+  # TOKEN SERVICE CONFIGURATION
+  token:
+    build:
+      context: "."
+      dockerfile: "./token/Dockerfile"
+    depends_on:
+      - rabbitmq
+      - token-db
     links:
-      - user-db:postgres
-    container_name: pgadmin
-    image: dpage/pgadmin4
-    ports:
-      - "7300:80"
-    volumes:
-      - /data/pgadmin:/root/.pgadmin
+      - rabbitmq
     env_file:
-      - ./user/user.env
+      - .env
+      - ./token/token.env
+    ports:
+      - "7101:7101"
+    volumes:
+      - ./user:/opt/app
     networks:
-      - user-postgres
+      - backend
+  # POSTGRES DB
+  token-db:
+    container_name: token-postgres
+    volumes:
+      - /data/token-postgres:/data/postgres
+    env_file:
+      - ./token/token.env
+    image: postgres:alpine
+    ports:
+      - "7201:5432"
+    networks:
+      - backend
 
   #RABBITMQ CONFIGURATION
   rabbitmq:
