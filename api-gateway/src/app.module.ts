@@ -2,10 +2,11 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { ConfigService } from './services/config/config.service';
 import { ClientProxyFactory, Transport } from '@nestjs/microservices';
+import { UserController } from './user.controller';
 
 @Module({
   imports: [],
-  controllers: [AppController],
+  controllers: [AppController, UserController],
   providers: [
     ConfigService,
     {

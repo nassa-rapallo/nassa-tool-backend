@@ -3,10 +3,10 @@ import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 
 import { UserModule } from './user.module';
 // import getAmqUrl from './lib/utils/getAmqUrl';
-import { ConfigService } from './services/config.service';
+import { ConfigService, RabbitConf } from './services/config.service';
 
 async function bootstrap() {
-  const rabbit = new ConfigService().get('rabbit');
+  const rabbit = new ConfigService().get<RabbitConf>('rabbit');
 
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     UserModule,

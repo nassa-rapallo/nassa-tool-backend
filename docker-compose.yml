@@ -14,6 +14,8 @@ services:
       - "7000:7000"
     volumes:
       - ./api-gateway:/opt/app
+    networks:
+      - backend
 
   # USER SERVICE CONFIGURATION
   user:
@@ -32,6 +34,8 @@ services:
       - "7100:7100"
     volumes:
       - ./user:/opt/app
+    networks:
+      - backend
   # POSTGRES DB
   user-db:
     container_name: user-postgres
@@ -43,7 +47,8 @@ services:
     ports:
       - "7200:5432"
     networks:
-      - postgres
+      - backend
+      - user-postgres
   # PGADMIN
   pgadmin:
     links:
@@ -51,13 +56,13 @@ services:
     container_name: pgadmin
     image: dpage/pgadmin4
     ports:
-      - "8080:80"
+      - "7300:80"
     volumes:
       - /data/pgadmin:/root/.pgadmin
     env_file:
       - ./user/user.env
     networks:
-      - postgres
+      - user-postgres
 
   #RABBITMQ CONFIGURATION
   rabbitmq:
@@ -71,8 +76,11 @@ services:
       - "15672:15672"
     env_file:
       - .env
+    networks:
+      - backend
 
   # NETWORKS
 networks:
-  postgres:
+  backend:
+  user-postgres:
     driver: bridge
