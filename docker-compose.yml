@@ -1,0 +1,69 @@
+version: "3"
+services:
+  api-gateway:
+    build:
+      context: "."
+      dockerfile: "./api-gateway/Dockerfile"
+    env_file:
+      - .env
+      - ./api-gateway/gateway.env
+    depends_on:
+      - rabbitmq
+      - user
+    ports:
+      - "7000:7000"
+    volumes:
+      - ./api-gateway:/opt/app
+
+  # USER SERVICE CONFIGURATION
+  user:
+    build:
+      context: "."
+      dockerfile: "./user/Dockerfile"
+    depends_on:
+      - rabbitmq
+      - user-db
+    links:
+      - rabbitmq
+    env_file:
+      - .env
+      - ./user/user.env
+    ports:
+      - "7100:7100"
+    volumes:
+      - ./user:/opt/app
+  user-db:
+    container_name: user-postgres
+    volumes:
+      - /data/user-postgres:/data/postgres
+    env_file:
+      - ./user/user.env
+    image: postgres:alpine
+    ports:
+      - "7200:5432"
+  # user-pgadmin:
+  #   links:
+  #     - postgres:postgres
+  #   container_name: user-pgadmin
+  #   image: dpage/pgadmin4
+  #   ports:
+  #     - "7300:80"
+  #   volumes:
+  #     - /data/pgadmin:/root/.pgadmin
+  #   env_file:
+  #     - ./user/user.env
+  #   networks:
+  #     - postgres
+
+  #RABBITMQ CONFIGURATION
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    hostname: rabbitmq
+    volumes:
+      - /var/lib/rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    env_file:
+      - .env
