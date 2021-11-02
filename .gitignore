@@ -1,5 +1,6 @@
 # .env
-token.env
-*.env
+**/node_modules
+**/dist
 **/*.env
-token/token.env
+**/yarn-error.log
+*.env

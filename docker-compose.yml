@@ -62,7 +62,7 @@ services:
       - rabbitmq
     env_file:
       - .env
-      - ./token/token.env
+      - ./token/user-token.env
     ports:
       - "7101:7101"
     volumes:
@@ -75,7 +75,7 @@ services:
     volumes:
       - /data/token-postgres:/data/postgres
     env_file:
-      - ./token/token.env
+      - ./token/user-token.env
     image: postgres:alpine
     ports:
       - "7201:5432"
