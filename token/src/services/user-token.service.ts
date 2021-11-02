@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserToken } from 'src/entities/user-token.entity';
+import { DecodeTokenResponse } from 'src/responses/DecodeTokenResponse';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -29,9 +30,11 @@ export class UserTokenService {
     return this.userTokenRepository.delete({ userId });
   }
 
-  async decodeToken(token: string) {
+  async decodeToken(data: {
+    token: string;
+  }): Promise<DecodeTokenResponse | null> {
     const tokenModel = await this.userTokenRepository.findOne({
-      token,
+      token: data.token,
     });
     if (!tokenModel || !tokenModel[0]) return null;
 
