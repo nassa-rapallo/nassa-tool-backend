@@ -21,4 +21,12 @@ export class UserService {
   async getUsers() {
     return this.userRepository.find();
   }
+
+  async searchByEmail(data: { email: string }): Promise<User | undefined> {
+    return this.userRepository.findOne({ where: { email: data.email } });
+  }
+
+  async verifyPassword(user: User, password: string): Promise<boolean> {
+    return user.password === password;
+  }
 }

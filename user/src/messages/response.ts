@@ -1,0 +1,9 @@
+const DEFAULT = {
+  SEARCH_BY_CREDENTIALS: 'user_search_by_credentials_',
+};
+
+export const SEARCH_BY_CREDENTIALS = {
+  NOT_FOUND: DEFAULT.SEARCH_BY_CREDENTIALS + 'not_found',
+  NOT_MATCH: DEFAULT.SEARCH_BY_CREDENTIALS + 'not_match',
+  SUCCESS: DEFAULT.SEARCH_BY_CREDENTIALS + 'success',
+};

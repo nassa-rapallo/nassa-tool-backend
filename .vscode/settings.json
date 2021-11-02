@@ -1,3 +1,12 @@
 {
-    "eslint.workingDirectories": ["./api-gateway", "./user", "./token"]
+    "eslint.workingDirectories": [
+        "./api-gateway",
+        "./user",
+        "./token"
+    ],
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#362D08",
+        "titleBar.activeBackground": "#4C3F0B",
+        "titleBar.activeForeground": "#FDFAEF"
+    }
 }

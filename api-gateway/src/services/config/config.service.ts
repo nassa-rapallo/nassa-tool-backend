@@ -18,7 +18,10 @@ export class ConfigService {
 
     this.envConfig.rabbit = {
       host: process.env.RABBITMQ_FULL_HOST,
-      queues: { user: process.env.RABBITMQ_USER_QUEUE_NAME },
+      queues: {
+        user: process.env.RABBITMQ_USER_QUEUE_NAME,
+        token: process.env.RABBITMQ_TOKEN_QUEUE_NAME,
+      },
     };
   }
 

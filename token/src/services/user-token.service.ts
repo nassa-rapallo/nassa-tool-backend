@@ -13,12 +13,16 @@ export class UserTokenService {
   ) {}
 
   async createToken(userId: string): Promise<UserToken> {
-    const token = this.jwtService.sign(
-      { userId },
-      { expiresIn: 30 * 24 * 60 * 60 },
-    );
-
-    return this.userTokenRepository.save({ userId, token });
+    try {
+      const token = this.jwtService.sign(
+        { userId },
+        { expiresIn: 30 * 24 * 60 * 60 },
+      );
+      const saved = await this.userTokenRepository.save({ userId, token });
+      return saved;
+    } catch (e) {
+      console.log('error', e);
+    }
   }
 
   async deleteTokenForUserId(userId: string) {

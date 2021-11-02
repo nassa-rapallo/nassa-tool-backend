@@ -1,4 +1,4 @@
-export class ITokenResponse {
+export class TokenResponse {
   status: number;
   token: string | null;
   message: string;

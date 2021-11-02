@@ -3,3 +3,4 @@ node_modules/
 token/node_modules
 api_gateway/node_modules
 user/node_modules
+token/token.env
