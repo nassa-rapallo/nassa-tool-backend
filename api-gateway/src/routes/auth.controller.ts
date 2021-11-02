@@ -44,6 +44,8 @@ export class AuthController {
       this.userServiceClient.send(USER_SEARCH_BY_CREDENTIALS, loginRequest),
     );
 
+    console.log('getUserResponse', getUserResponse);
+
     if (!isOk(getUserResponse.status))
       throw new HttpException(
         {
@@ -54,18 +56,14 @@ export class AuthController {
         HttpStatus.UNAUTHORIZED,
       );
 
-    console.log('HERE');
-
     const createTokenResponse: TokenCreateResponse = await firstValueFrom(
       this.tokenServiceClient.send(TOKEN_CREATE, {
         userId: getUserResponse.user.id,
       }),
     );
 
-    console.log('TOKEN-RESPONSE', createTokenResponse);
-
     return {
-      message: createTokenResponse.message,
+      message: 'login_success',
       data: {
         token: createTokenResponse.token,
       },

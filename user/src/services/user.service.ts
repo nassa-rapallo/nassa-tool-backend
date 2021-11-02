@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
 import { createUserDto } from 'src/model/createUserDto';
 import { Repository } from 'typeorm';
+import { verify } from 'argon2';
 
 @Injectable()
 export class UserService {
@@ -15,7 +16,8 @@ export class UserService {
   }
 
   async createUser(createUser: createUserDto) {
-    return this.userRepository.save(createUser);
+    const user = this.userRepository.create(createUser);
+    return this.userRepository.save(user);
   }
 
   async getUsers() {
@@ -27,6 +29,6 @@ export class UserService {
   }
 
   async verifyPassword(user: User, password: string): Promise<boolean> {
-    return user.password === password;
+    return verify(user.password, password);
   }
 }

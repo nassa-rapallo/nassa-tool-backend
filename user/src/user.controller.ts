@@ -54,19 +54,30 @@ export class UserController {
         user: null,
       };
 
+    // CHECK PASSWORD
+    const verifiedPassword = await this.userService.verifyPassword(
+      user,
+      userCredentials.password,
+    );
+
     // WRONG PASSWORD
-    if (!this.userService.verifyPassword(user, userCredentials.password))
+    if (!verifiedPassword) {
       return {
         status: HttpStatus.NOT_FOUND,
         message: SEARCH_BY_CREDENTIALS.NOT_MATCH,
         user: null,
       };
+    }
 
     // SUCCESS
     return {
       status: HttpStatus.OK,
       message: SEARCH_BY_CREDENTIALS.SUCCESS,
-      user: user,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      },
     };
   }
 }

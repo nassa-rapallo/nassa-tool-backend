@@ -13,7 +13,6 @@ export class UserTokenController {
 
   @MessagePattern('token_hello')
   tokenHello(): string {
-    console.log('hello');
     return 'hello token';
   }
 
@@ -21,8 +20,7 @@ export class UserTokenController {
   async createToken(
     @Payload() data: { userId: string },
   ): Promise<TokenResponse> {
-    console.log('CREATE-DATA', data);
-
+    // WRONG DATA
     if (!data || !data.userId)
       return {
         status: HttpStatus.BAD_REQUEST,
@@ -31,16 +29,16 @@ export class UserTokenController {
       };
 
     try {
-      console.log('CREATE-TRY');
       const createResult = await this.userTokenService.createToken(data.userId);
 
-      console.log('CREATE-RESULT', createResult);
+      // SUCCESS
       return {
         status: HttpStatus.CREATED,
         message: CREATE.SUCCESS,
         token: createResult.token,
       };
     } catch {
+      // ERROR FROM JWT SIGNING
       return {
         status: HttpStatus.BAD_REQUEST,
         message: CREATE.BAD_REQUEST,
