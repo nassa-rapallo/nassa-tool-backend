@@ -8,8 +8,10 @@ import {
   USER_CREATE,
   USER_GET_ALL,
   USER_SEARCH_BY_CREDENTIALS,
+  USER_SEARCH_BY_ID,
 } from './messages/command';
-import { SEARCH_BY_CREDENTIALS } from './messages/response';
+import { SEARCH_BY_CREDENTIALS, SEARCH_BY_ID } from './messages/response';
+import { UserResponse } from './responses/UserResponse';
 
 @Controller()
 export class UserController {
@@ -78,6 +80,36 @@ export class UserController {
         email: user.email,
         name: user.name,
       },
+    };
+  }
+
+  @MessagePattern(USER_SEARCH_BY_ID)
+  public async getUserById(
+    @Payload() data: { id: string },
+  ): Promise<UserSearchResponse> {
+    // WRONG DATA
+    if (!data.id)
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        message: SEARCH_BY_ID.BAD_REQUEST,
+        user: null,
+      };
+
+    const user = await this.userService.searchById({ id: data.id });
+
+    // WRONG ID
+    if (!user)
+      return {
+        status: HttpStatus.NOT_FOUND,
+        message: SEARCH_BY_ID.NOT_FOUND,
+        user: null,
+      };
+
+    // SUCCESS
+    return {
+      status: HttpStatus.OK,
+      message: SEARCH_BY_ID.SUCCESS,
+      user,
     };
   }
 }

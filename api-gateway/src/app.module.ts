@@ -5,6 +5,8 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
 import { UserController } from './user.controller';
 import { AuthController } from './routes/auth.controller';
 import { USER_SERVICE, TOKEN_SERVICE } from './clients';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './services/guards/authorization.guard';
 
 @Module({
   imports: [],
@@ -47,6 +49,10 @@ import { USER_SERVICE, TOKEN_SERVICE } from './clients';
         });
       },
       inject: [ConfigService],
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
     },
   ],
 })

@@ -28,6 +28,10 @@ export class UserService {
     return this.userRepository.findOne({ where: { email: data.email } });
   }
 
+  async searchById(data: { id: string }): Promise<User | undefined> {
+    return this.userRepository.findOne({ where: { id: data.id } });
+  }
+
   async verifyPassword(user: User, password: string): Promise<boolean> {
     return verify(user.password, password);
   }
