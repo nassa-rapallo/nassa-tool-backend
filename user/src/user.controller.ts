@@ -11,7 +11,6 @@ import {
   USER_SEARCH_BY_ID,
 } from './messages/command';
 import { SEARCH_BY_CREDENTIALS, SEARCH_BY_ID } from './messages/response';
-import { UserResponse } from './responses/UserResponse';
 
 @Controller()
 export class UserController {
