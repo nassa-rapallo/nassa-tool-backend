@@ -98,10 +98,44 @@ services:
     networks:
       - backend
 
+  permission:
+    build:
+      context: "."
+      dockerfile: "./permission/Dockerfile"
+    depends_on:
+      - rabbitmq
+      - permission-db
+    links:
+      - rabbitmq
+    env_file:
+      - .env
+      - ./permission/permission.env
+    ports:
+      - "7102:7102"
+    volumes:
+      - ./permission:/opt/app
+    networks:
+      - backend
+  # POSTGRES DB
+  permission-db:
+    container_name: permission-postgres
+    volumes:
+      - /data/permission-postgres:/data/postgres
+    env_file:
+      - ./permission/permission.env
+    image: postgres:alpine
+    ports:
+      - "7202:5432"
+    networks:
+      - permission-postgres
+      - backend
+
   # NETWORKS
 networks:
   backend:
   user-postgres:
     driver: bridge
   token-postgres:
+    driver: bridge
+  permission-postgres:
     driver: bridge
