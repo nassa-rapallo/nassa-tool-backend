@@ -1,7 +1,7 @@
 import { TokenDestroyResponse } from './responses/TokenDestroyResponse';
 import { Controller, HttpStatus } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { TOKEN_CREATE, TOKEN_DECODE } from './messages/command';
+import { TOKEN_CREATE, TOKEN_DECODE, TOKEN_DESTROY } from './messages/command';
 import { CREATE, DECODE } from './messages/response';
 import { TokenResponse } from './responses/TokenResponse';
 import { TokenDataResponse } from './responses/TokenDataResponse';
@@ -11,9 +11,9 @@ import { UserTokenService } from './services/user-token.service';
 export class UserTokenController {
   constructor(private readonly userTokenService: UserTokenService) {}
 
-  @MessagePattern('token_hello')
+  @MessagePattern('hello_token')
   tokenHello(): string {
-    return 'hello token';
+    return 'Hello from Token';
   }
 
   @MessagePattern(TOKEN_CREATE)
@@ -62,7 +62,7 @@ export class UserTokenController {
     };
   }
 
-  @MessagePattern('token_destroy')
+  @MessagePattern(TOKEN_DESTROY)
   public async destroyToken(data: {
     userId: string;
   }): Promise<TokenDestroyResponse> {

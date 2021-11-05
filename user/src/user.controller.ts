@@ -16,9 +16,9 @@ import { SEARCH_BY_CREDENTIALS, SEARCH_BY_ID } from './messages/response';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @MessagePattern('user_hello')
+  @MessagePattern('hello_user')
   getHello(): string {
-    return this.userService.getHello();
+    return 'Hello from User';
   }
 
   @MessagePattern(USER_CREATE)

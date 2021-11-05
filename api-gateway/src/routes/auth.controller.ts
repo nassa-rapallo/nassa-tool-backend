@@ -27,12 +27,6 @@ export class AuthController {
     @Inject(TOKEN_SERVICE) private readonly tokenServiceClient: ClientProxy,
   ) {}
 
-  @Get()
-  async helloToken() {
-    console.log('HERE');
-    return firstValueFrom(this.tokenServiceClient.send('token_hello', {}));
-  }
-
   @Post('/login')
   @ApiCreatedResponse({
     type: LoginUserResponse,
@@ -43,8 +37,6 @@ export class AuthController {
     const getUserResponse: UserSearchResponse = await firstValueFrom(
       this.userServiceClient.send(USER_SEARCH_BY_CREDENTIALS, loginRequest),
     );
-
-    console.log('getUserResponse', getUserResponse);
 
     if (!isOk(getUserResponse.status))
       throw new HttpException(

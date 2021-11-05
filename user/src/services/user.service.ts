@@ -11,10 +11,6 @@ export class UserService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  getHello(): string {
-    return 'Hello World!';
-  }
-
   async createUser(createUser: createUserDto) {
     const user = this.userRepository.create(createUser);
     return this.userRepository.save(user);
