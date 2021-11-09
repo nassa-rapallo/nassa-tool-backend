@@ -1,20 +1,32 @@
+import { UserResponse } from './../responses/UserResponses';
 import { Controller, HttpStatus } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { UserService } from './services/user.service';
-import { createUserDto } from './model/createUserDto';
-import { UserCredentialsDto } from './model/userCredentialsDto';
-import { UserSearchResponse } from './responses/UserSearchResponse';
+import { UserService } from '../services/user.service';
+import { createUserDto } from '../model/createUserDto';
+import { UserCredentialsDto } from '../model/userCredentialsDto';
 import {
+  USER_ADD_ROLE,
   USER_CREATE,
   USER_GET_ALL,
   USER_SEARCH_BY_CREDENTIALS,
   USER_SEARCH_BY_ID,
-} from './messages/command';
-import { SEARCH_BY_CREDENTIALS, SEARCH_BY_ID } from './messages/response';
+} from '../messages/command';
+import {
+  ADD_ROLE_TO_USER,
+  SEARCH_BY_CREDENTIALS,
+  SEARCH_BY_ID,
+} from '../messages/response';
+import { UserSearchResponse } from '../responses/UserResponses';
+import { RoleService } from 'src/services/role.service';
+import { Connection } from 'typeorm';
 
 @Controller()
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly connection: Connection,
+    private readonly roleService: RoleService,
+    private readonly userService: UserService,
+  ) {}
 
   @MessagePattern('hello_user')
   getHello(): string {
@@ -40,7 +52,7 @@ export class UserController {
       return {
         status: HttpStatus.NOT_FOUND,
         message: SEARCH_BY_CREDENTIALS.NOT_FOUND,
-        user: null,
+        data: null,
       };
 
     const user = await this.userService.searchByEmail({
@@ -52,7 +64,7 @@ export class UserController {
       return {
         status: HttpStatus.NOT_FOUND,
         message: SEARCH_BY_CREDENTIALS.NOT_FOUND,
-        user: null,
+        data: null,
       };
 
     // CHECK PASSWORD
@@ -66,7 +78,7 @@ export class UserController {
       return {
         status: HttpStatus.NOT_FOUND,
         message: SEARCH_BY_CREDENTIALS.NOT_MATCH,
-        user: null,
+        data: null,
       };
     }
 
@@ -74,10 +86,13 @@ export class UserController {
     return {
       status: HttpStatus.OK,
       message: SEARCH_BY_CREDENTIALS.SUCCESS,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
+      data: {
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          roles: user.roles,
+        },
       },
     };
   }
@@ -91,7 +106,7 @@ export class UserController {
       return {
         status: HttpStatus.BAD_REQUEST,
         message: SEARCH_BY_ID.BAD_REQUEST,
-        user: null,
+        data: null,
       };
 
     const user = await this.userService.searchById({ id: data.id });
@@ -101,14 +116,63 @@ export class UserController {
       return {
         status: HttpStatus.NOT_FOUND,
         message: SEARCH_BY_ID.NOT_FOUND,
-        user: null,
+        data: null,
       };
 
     // SUCCESS
     return {
       status: HttpStatus.OK,
       message: SEARCH_BY_ID.SUCCESS,
-      user,
+      data: { user },
     };
+  }
+
+  @MessagePattern(USER_ADD_ROLE)
+  public async addRoleToUser(
+    @Payload() data: { userId: string; roleId: string },
+  ): Promise<UserResponse> {
+    const user = await this.userService.searchById({ id: data.userId });
+    if (!user)
+      return {
+        status: HttpStatus.NOT_FOUND,
+        message: ADD_ROLE_TO_USER.USER_NOT_FOUND,
+        data: null,
+      };
+
+    const role = await this.roleService.getRoleById({ id: data.roleId });
+
+    if (!role)
+      return {
+        status: HttpStatus.NOT_FOUND,
+        message: ADD_ROLE_TO_USER.ROLE_NOT_FOUND,
+        data: null,
+      };
+
+    const sectionIdx = user.roles.findIndex((r) => r.section === role.section);
+
+    if (sectionIdx !== -1)
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        message: ADD_ROLE_TO_USER.BAD_REQUEST,
+        data: null,
+      };
+
+    user.roles = [role, ...user.roles];
+
+    try {
+      const updatedUser = await this.connection.manager.save(user);
+
+      return {
+        status: HttpStatus.OK,
+        message: ADD_ROLE_TO_USER.SUCCESS,
+        data: { user: updatedUser },
+      };
+    } catch {
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        message: ADD_ROLE_TO_USER.BAD_REQUEST,
+        data: null,
+      };
+    }
   }
 }

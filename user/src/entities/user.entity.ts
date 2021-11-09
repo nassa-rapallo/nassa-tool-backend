@@ -3,11 +3,15 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 import { hash } from 'argon2';
+import { Role } from './role.entity';
+import { DEFAULT_ROLE } from 'src/contants';
 
 @Entity()
 export class User {
@@ -22,6 +26,13 @@ export class User {
 
   @Column()
   password: string;
+
+  @Column({ default: DEFAULT_ROLE })
+  default_role: string;
+
+  @ManyToMany(() => Role)
+  @JoinColumn()
+  roles: Role[];
 
   @CreateDateColumn()
   createdAt: Date;
