@@ -8,10 +8,17 @@ import { USER_SERVICE, TOKEN_SERVICE, PERMISSION_SERVICE } from './clients';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './services/guards/authorization.guard';
 import { HelloController } from './routes/hello.controller';
+import { RoleController } from './routes/role.controller';
 
 @Module({
   imports: [],
-  controllers: [HelloController, AppController, UserController, AuthController],
+  controllers: [
+    HelloController,
+    AppController,
+    UserController,
+    AuthController,
+    RoleController,
+  ],
   providers: [
     ConfigService,
     {

@@ -11,9 +11,12 @@ export class UserService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  async createUser(createUser: createUserDto) {
-    const user = this.userRepository.create(createUser);
-    return this.userRepository.save(user);
+  async createUser(createUser: createUserDto): Promise<User> {
+    const alreadyExists = await this.searchByEmail({ email: createUser.email });
+
+    if (alreadyExists) return undefined;
+
+    return this.userRepository.save({ ...createUser });
   }
 
   async getUsers() {
@@ -21,11 +24,17 @@ export class UserService {
   }
 
   async searchByEmail(data: { email: string }): Promise<User | undefined> {
-    return this.userRepository.findOne({ where: { email: data.email } });
+    return this.userRepository.findOne({
+      where: { email: data.email },
+      relations: ['roles'],
+    });
   }
 
   async searchById(data: { id: string }): Promise<User | undefined> {
-    return this.userRepository.findOne({ where: { id: data.id } });
+    return this.userRepository.findOne({
+      where: { id: data.id },
+      relations: ['roles'],
+    });
   }
 
   async verifyPassword(user: User, password: string): Promise<boolean> {

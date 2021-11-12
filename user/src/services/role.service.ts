@@ -32,7 +32,7 @@ export class RoleService {
     });
   }
 
-  async createRole({ name, section }: RoleDto) {
+  async createRole({ name, section }: RoleDto): Promise<Role | undefined> {
     const isAlreadyPresent = await this.roleRepository.findOne({
       where: { name: name, section: section },
     });

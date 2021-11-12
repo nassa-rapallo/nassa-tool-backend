@@ -34,8 +34,23 @@ export class UserController {
   }
 
   @MessagePattern(USER_CREATE)
-  createUser(@Payload() createUser: createUserDto) {
-    return this.userService.createUser(createUser);
+  async createUser(
+    @Payload() createUser: createUserDto,
+  ): Promise<UserResponse> {
+    const created = await this.userService.createUser(createUser);
+
+    if (!created)
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        message: 'bad_request',
+        data: null,
+      };
+
+    return {
+      status: HttpStatus.OK,
+      message: 'success',
+      data: { user: created },
+    };
   }
 
   @MessagePattern(USER_GET_ALL)
