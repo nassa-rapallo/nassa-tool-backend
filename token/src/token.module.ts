@@ -1,11 +1,11 @@
-import { UserTokenController } from './user-token.controller';
+import { UserTokenController } from './controllers/user-token.controller';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserToken } from './entities/user-token.entity';
-import { TypeOrmConfigService } from './services/typeorm-config.service';
+import { TypeOrmConfigService } from './services/config/typeorm-config.service';
 import { UserTokenService } from './services/user-token.service';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtConfigService } from './services/jwt-config.service';
+import { JwtConfigService } from './services/config/jwt-config.service';
 
 @Module({
   imports: [

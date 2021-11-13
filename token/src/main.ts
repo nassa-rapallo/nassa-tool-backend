@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { ConfigService, RabbitConf } from './services/config.service';
+import { ConfigService, RabbitConf } from './services/config/config.service';
 import { TokenModule } from './token.module';
 
 async function bootstrap() {

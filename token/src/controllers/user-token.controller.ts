@@ -1,11 +1,11 @@
-import { TokenDestroyResponse } from './responses/TokenDestroyResponse';
+import { TokenDestroyResponse } from '../responses/TokenDestroyResponse';
 import { Controller, HttpStatus } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { TOKEN_CREATE, TOKEN_DECODE, TOKEN_DESTROY } from './messages/command';
-import { CREATE, DECODE } from './messages/response';
-import { TokenResponse } from './responses/TokenResponse';
-import { TokenDataResponse } from './responses/TokenDataResponse';
-import { UserTokenService } from './services/user-token.service';
+import { TOKEN_CREATE, TOKEN_DECODE, TOKEN_DESTROY } from '../messages/command';
+import { CREATE, DECODE } from '../messages/response';
+import { TokenResponse } from '../responses/TokenResponse';
+import { TokenDataResponse } from '../responses/TokenDataResponse';
+import { UserTokenService } from '../services/user-token.service';
 
 @Controller()
 export class UserTokenController {

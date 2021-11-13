@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
-import { PermissionService } from './permission.service';
+import { PermissionService } from '../services/permission.service';
 
 @Controller()
 export class PermissionController {
