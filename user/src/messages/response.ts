@@ -1,8 +1,15 @@
 // ROLES RESPONSE MESSAGES
 const USER_DEFAULT = {
+  CREATE: 'user_create_user_',
   SEARCH_BY_CREDENTIALS: 'user_search_by_credentials_',
   SEARCH_BY_ID: 'user_search_by_id_',
   ADD_ROLE_TO_USER: 'user_add_role_to_user_',
+};
+
+export const CREATE_USER = {
+  BAD_REQUEST: USER_DEFAULT.CREATE + 'bad_request',
+  CREATED: USER_DEFAULT.CREATE + 'created',
+  PRECONDITION_FAILED: USER_DEFAULT.CREATE + 'precondition_failed',
 };
 
 export const SEARCH_BY_CREDENTIALS = {

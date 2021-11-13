@@ -12,10 +12,6 @@ export class UserService {
   ) {}
 
   async createUser(createUser: createUserDto): Promise<User> {
-    const alreadyExists = await this.searchByEmail({ email: createUser.email });
-
-    if (alreadyExists) return undefined;
-
     return this.userRepository.save({ ...createUser });
   }
 

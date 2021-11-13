@@ -13,6 +13,7 @@ import {
 } from '../messages/command';
 import {
   ADD_ROLE_TO_USER,
+  CREATE_USER,
   SEARCH_BY_CREDENTIALS,
   SEARCH_BY_ID,
 } from '../messages/response';
@@ -37,25 +38,48 @@ export class UserController {
   async createUser(
     @Payload() createUser: createUserDto,
   ): Promise<UserResponse> {
-    const created = await this.userService.createUser(createUser);
+    try {
+      const created = await this.userService.createUser(createUser);
 
-    if (!created)
+      if (!created)
+        return {
+          status: HttpStatus.BAD_REQUEST,
+          message: CREATE_USER.BAD_REQUEST,
+          data: null,
+        };
+
       return {
-        status: HttpStatus.BAD_REQUEST,
-        message: 'bad_request',
-        data: null,
+        status: HttpStatus.CREATED,
+        message: CREATE_USER.CREATED,
+        data: { user: created },
       };
-
-    return {
-      status: HttpStatus.OK,
-      message: 'success',
-      data: { user: created },
-    };
+    } catch (e) {
+      return {
+        status: HttpStatus.PRECONDITION_FAILED,
+        message: CREATE_USER.BAD_REQUEST,
+        data: null,
+        errors: [e.driverError.detail],
+      };
+    }
   }
 
   @MessagePattern(USER_GET_ALL)
-  getAllUsers() {
-    return this.userService.getUsers();
+  async getAllUsers() {
+    try {
+      const users = await this.userService.getUsers();
+
+      return {
+        status: HttpStatus.OK,
+        message: 'success',
+        data: { users },
+      };
+    } catch (e) {
+      return {
+        status: HttpStatus.NOT_FOUND,
+        message: 'not found',
+        data: null,
+      };
+    }
   }
 
   @MessagePattern(USER_SEARCH_BY_CREDENTIALS)
@@ -99,7 +123,7 @@ export class UserController {
 
     // SUCCESS
     return {
-      status: HttpStatus.OK,
+      status: HttpStatus.FOUND,
       message: SEARCH_BY_CREDENTIALS.SUCCESS,
       data: {
         user: {
@@ -136,7 +160,7 @@ export class UserController {
 
     // SUCCESS
     return {
-      status: HttpStatus.OK,
+      status: HttpStatus.FOUND,
       message: SEARCH_BY_ID.SUCCESS,
       data: { user },
     };

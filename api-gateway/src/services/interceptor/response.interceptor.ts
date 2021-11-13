@@ -11,9 +11,10 @@ import { map } from 'rxjs/operators';
 import { Response } from 'src/lib/Response';
 
 const EMPTY_ERRORS = [''];
+const GOOD_STATUS = [HttpStatus.OK, HttpStatus.FOUND, HttpStatus.CREATED];
 
 const handleResponse = (res: Response<unknown>) => {
-  if (res.status === HttpStatus.OK) return res;
+  if (GOOD_STATUS.includes(res.status)) return res;
 
   throw new HttpException(
     {
