@@ -2,14 +2,14 @@ import {
   Body,
   Controller,
   Get,
-  HttpException,
-  HttpStatus,
   Inject,
   Post,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { firstValueFrom } from 'rxjs';
+import { ResponseInterceptor } from 'src/services/interceptor/response.interceptor';
 import {
   USER_ADD_ROLE,
   USER_CREATE,
@@ -17,6 +17,7 @@ import {
 } from '../clients/user/commands';
 import { createUserDto } from '../model/user/dto/CreateUserDto';
 
+@UseInterceptors(ResponseInterceptor)
 @Controller('users')
 @ApiTags('users')
 export class UserController {
@@ -35,19 +36,7 @@ export class UserController {
 
   @Post()
   async createUser(@Body() createUser: createUserDto) {
-    const response = await firstValueFrom(
-      this.userServiceClient.send(USER_CREATE, createUser),
-    );
-
-    if (response.status !== HttpStatus.OK) {
-      throw new HttpException(
-        {
-          message: response.message,
-          data: null,
-        },
-        response.status,
-      );
-    }
+    return firstValueFrom(this.userServiceClient.send(USER_CREATE, createUser));
   }
 
   @Post('/role')
