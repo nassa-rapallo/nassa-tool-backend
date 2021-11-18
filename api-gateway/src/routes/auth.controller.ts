@@ -17,11 +17,12 @@ import {
   USER_SEARCH_BY_ID,
 } from 'src/clients/user/commands';
 import { isOk } from 'src/lib/responseCode';
-import { LoginUserDto } from 'src/model/auth/dto/LoginUserDto';
-import { LoginUserResponse } from 'src/model/auth/response/LoginUserResponse';
-import { TokenCreateResponse } from 'src/model/auth/response/TokenCreateResponse';
-import { UserSearchResponse } from 'src/model/user/response/UserSearchResponse';
-import { TokenDestroyResponse } from 'src/model/auth/response/TokenDeleteResponse';
+import { LoginUserDto } from 'src/modules/auth/model/dto/LoginUserDto';
+import { LoginUserResponse } from 'src/modules/auth/model/response/LoginUserResponse';
+import { TokenCreateResponse } from 'src/modules/token/model/response/TokenCreateResponse';
+import { UserSearchResponse } from 'src/modules/user/model/response/UserSearchResponse';
+import { TokenDestroyResponse } from 'src/modules/token/model/response/TokenDeleteResponse';
+import { LoginResponseType } from 'src/modules/auth/swagger/LoginResponseType';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -33,7 +34,7 @@ export class AuthController {
 
   @Post('/login')
   @ApiCreatedResponse({
-    type: LoginUserResponse,
+    type: LoginResponseType,
   })
   async loginUser(
     @Body() loginRequest: LoginUserDto,
@@ -47,7 +48,7 @@ export class AuthController {
         {
           message: getUserResponse.message,
           data: null,
-          errors: null,
+          errors: getUserResponse.errors,
         },
         HttpStatus.UNAUTHORIZED,
       );
@@ -59,11 +60,11 @@ export class AuthController {
     );
 
     return {
+      status: createTokenResponse.status,
       message: 'login_success',
       data: {
-        token: createTokenResponse.token,
+        token: createTokenResponse.data.token,
       },
-      errors: null,
     };
   }
 

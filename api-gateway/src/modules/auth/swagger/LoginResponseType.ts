@@ -1,6 +1,10 @@
+import { HttpStatus } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class LoginUserResponse {
+export class LoginResponseType {
+  @ApiProperty({ example: HttpStatus.OK })
+  status: number;
+
   @ApiProperty({ example: 'token_create_success' })
   message: string;
 
@@ -10,5 +14,5 @@ export class LoginUserResponse {
   };
 
   @ApiProperty({ example: null, nullable: true })
-  errors: { [key: string]: any };
+  errors: string[];
 }

@@ -3,7 +3,7 @@ import { Controller, Get, Inject, Post, Body } from '@nestjs/common';
 import { USER_SERVICE } from 'src/clients';
 import { firstValueFrom } from 'rxjs';
 import { ROLE_CREATE, ROLE_GET_ALL } from 'src/clients/role/commands';
-import { CreateUserDto } from 'src/model/roles/dto/CreateUserDto';
+import { CreateUserDto } from 'src/modules/role/dto/CreateUserDto';
 
 @Controller('roles')
 export class RoleController {

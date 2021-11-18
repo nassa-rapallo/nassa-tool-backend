@@ -15,7 +15,7 @@ import {
   USER_CREATE,
   USER_GET_ALL,
 } from '../clients/user/commands';
-import { createUserDto } from '../model/user/dto/CreateUserDto';
+import { createUserDto } from '../modules/user/model/dto/CreateUserDto';
 
 @UseInterceptors(ResponseInterceptor)
 @Controller('users')
