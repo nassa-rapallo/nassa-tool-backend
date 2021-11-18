@@ -13,7 +13,9 @@ import { Response } from 'src/lib/Response';
 const EMPTY_ERRORS = [''];
 const GOOD_STATUS = [HttpStatus.OK, HttpStatus.FOUND, HttpStatus.CREATED];
 
-const handleResponse = (res: Response<unknown>) => {
+const handleResponse = (res: Response<unknown> | string) => {
+  if (typeof res === 'string') return res;
+
   if (GOOD_STATUS.includes(res.status)) return res;
 
   throw new HttpException(
