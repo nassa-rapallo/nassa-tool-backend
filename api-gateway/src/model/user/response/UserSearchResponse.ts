@@ -1,7 +1,4 @@
+import { Response } from 'src/lib/Response';
 import { User } from '../User';
 
-export class UserSearchResponse {
-  status: number;
-  message: string;
-  user: User | null;
-}
+export type UserSearchResponse = Response<{ user: User }>;

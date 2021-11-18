@@ -1,5 +1,3 @@
-export class TokenDataResponse {
-  status: number;
-  message: string;
-  data: { userId: string } | null;
-}
+import { Response } from './Response';
+
+export type TokenDataResponse = Response<{ userId: string }>;

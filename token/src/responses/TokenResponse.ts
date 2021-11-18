@@ -1,5 +1,3 @@
-export class TokenResponse {
-  status: number;
-  token: string | null;
-  message: string;
-}
+import { Response } from './Response';
+
+export type TokenResponse = Response<{ token: string }>;

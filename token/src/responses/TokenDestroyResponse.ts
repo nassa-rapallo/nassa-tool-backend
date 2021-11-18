@@ -1,5 +1,3 @@
-export interface TokenDestroyResponse {
-  status: number;
-  message: string;
-  errors: { [key: string]: any } | null;
-}
+import { Response } from './Response';
+
+export type TokenDestroyResponse = Response<boolean>;

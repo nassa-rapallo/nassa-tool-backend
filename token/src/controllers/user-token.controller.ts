@@ -2,7 +2,7 @@ import { TokenDestroyResponse } from '../responses/TokenDestroyResponse';
 import { Controller, HttpStatus } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { TOKEN_CREATE, TOKEN_DECODE, TOKEN_DESTROY } from '../messages/command';
-import { CREATE, DECODE } from '../messages/response';
+import { CREATE, DECODE, DESTROY } from '../messages/response';
 import { TokenResponse } from '../responses/TokenResponse';
 import { TokenDataResponse } from '../responses/TokenDataResponse';
 import { UserTokenService } from '../services/user-token.service';
@@ -25,7 +25,8 @@ export class UserTokenController {
       return {
         status: HttpStatus.BAD_REQUEST,
         message: CREATE.BAD_REQUEST,
-        token: null,
+        data: null,
+        errors: ['wrong-data'],
       };
 
     try {
@@ -35,14 +36,15 @@ export class UserTokenController {
       return {
         status: HttpStatus.CREATED,
         message: CREATE.SUCCESS,
-        token: createResult.token,
+        data: { token: createResult.token },
       };
-    } catch {
+    } catch (e) {
       // ERROR FROM JWT SIGNING
       return {
         status: HttpStatus.BAD_REQUEST,
         message: CREATE.BAD_REQUEST,
-        token: null,
+        data: null,
+        errors: [e.driverError.detail],
       };
     }
   }
@@ -66,14 +68,21 @@ export class UserTokenController {
   public async destroyToken(data: {
     userId: string;
   }): Promise<TokenDestroyResponse> {
-    return {
-      status: data && data.userId ? HttpStatus.OK : HttpStatus.BAD_REQUEST,
-      message:
-        data && data.userId
-          ? (await this.userTokenService.deleteTokenForUserId(data.userId)) &&
-            'token_destroy_success'
-          : 'token_destroy_bad_request',
-      errors: null,
-    };
+    try {
+      await this.userTokenService.deleteTokenForUserId(data.userId);
+
+      return {
+        status: HttpStatus.OK,
+        message: DESTROY.SUCCESS,
+        data: true,
+      };
+    } catch (e) {
+      return {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: DESTROY.FAILURE,
+        data: false,
+        errors: [e.driverError.detail],
+      };
+    }
   }
 }

@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserToken } from 'src/entities/user-token.entity';
-import { DecodeTokenResponse } from 'src/responses/DecodeTokenResponse';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -14,16 +13,11 @@ export class UserTokenService {
   ) {}
 
   async createToken(userId: string): Promise<UserToken> {
-    try {
-      const token = this.jwtService.sign(
-        { userId },
-        { expiresIn: 30 * 24 * 60 * 60 },
-      );
-      const saved = await this.userTokenRepository.save({ userId, token });
-      return saved;
-    } catch (e) {
-      console.log('error', e);
-    }
+    const token = this.jwtService.sign(
+      { userId },
+      { expiresIn: 30 * 24 * 60 * 60 },
+    );
+    return this.userTokenRepository.save({ userId, token });
   }
 
   async deleteTokenForUserId(userId: string) {
@@ -32,7 +26,7 @@ export class UserTokenService {
 
   async decodeToken(data: {
     token: string;
-  }): Promise<DecodeTokenResponse | null> {
+  }): Promise<{ userId: string } | undefined> {
     const tokenModel = await this.userTokenRepository.findOne({
       token: data.token,
     });
@@ -44,7 +38,7 @@ export class UserTokenService {
         userId: any;
       };
       if (!tokenData || tokenData.exp <= Math.floor(+new Date() / 1000))
-        return null;
+        return undefined;
       return {
         userId: tokenData.userId,
       };

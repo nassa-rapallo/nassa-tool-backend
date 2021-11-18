@@ -1,7 +1,7 @@
+import { Response } from 'src/lib/Response';
 import {
   Body,
   Controller,
-  Get,
   HttpException,
   HttpStatus,
   Inject,
@@ -11,13 +11,17 @@ import { ClientProxy } from '@nestjs/microservices';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { firstValueFrom } from 'rxjs';
 import { TOKEN_SERVICE, USER_SERVICE } from 'src/clients';
-import { TOKEN_CREATE } from 'src/clients/token/commands';
-import { USER_SEARCH_BY_CREDENTIALS } from 'src/clients/user/commands';
+import { TOKEN_CREATE, TOKEN_DESTROY } from 'src/clients/token/commands';
+import {
+  USER_SEARCH_BY_CREDENTIALS,
+  USER_SEARCH_BY_ID,
+} from 'src/clients/user/commands';
 import { isOk } from 'src/lib/responseCode';
 import { LoginUserDto } from 'src/model/auth/dto/LoginUserDto';
 import { LoginUserResponse } from 'src/model/auth/response/LoginUserResponse';
 import { TokenCreateResponse } from 'src/model/auth/response/TokenCreateResponse';
 import { UserSearchResponse } from 'src/model/user/response/UserSearchResponse';
+import { TokenDeleteResponse } from 'src/model/auth/response/TokenDeleteResponse';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -50,7 +54,7 @@ export class AuthController {
 
     const createTokenResponse: TokenCreateResponse = await firstValueFrom(
       this.tokenServiceClient.send(TOKEN_CREATE, {
-        userId: getUserResponse.user.id,
+        userId: getUserResponse.data.user.id,
       }),
     );
 
@@ -60,6 +64,43 @@ export class AuthController {
         token: createTokenResponse.token,
       },
       errors: null,
+    };
+  }
+
+  @Post('/logout')
+  async logoutUser(
+    @Body() data: { id: string },
+  ): Promise<Response<{ logout: boolean }>> {
+    const getUserResponse: UserSearchResponse = await firstValueFrom(
+      this.userServiceClient.send(USER_SEARCH_BY_ID, data),
+    );
+
+    if (!isOk(getUserResponse.status))
+      return {
+        message: 'logout_user_error',
+        status: getUserResponse.status,
+        errors: getUserResponse.errors,
+        data: { logout: false },
+      };
+
+    const deleteTokenResponse: TokenDeleteResponse = await firstValueFrom(
+      this.tokenServiceClient.send(TOKEN_DESTROY, {
+        id: getUserResponse.data.user.id,
+      }),
+    );
+
+    if (!isOk(deleteTokenResponse.status))
+      return {
+        message: 'logout_token_error',
+        status: deleteTokenResponse.status,
+        errors: deleteTokenResponse.errors,
+        data: { logout: false },
+      };
+
+    return {
+      message: 'logout_success',
+      status: deleteTokenResponse.status,
+      data: { logout: true },
     };
   }
 }
