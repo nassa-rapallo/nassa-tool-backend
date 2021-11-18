@@ -1,2 +1,2 @@
 import { Response } from 'src/lib/Response';
-export type TokenDeleteResponse = Response<{ token: string }>;
+export type TokenDestroyResponse = Response<boolean>;

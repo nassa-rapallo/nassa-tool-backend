@@ -21,7 +21,7 @@ import { LoginUserDto } from 'src/model/auth/dto/LoginUserDto';
 import { LoginUserResponse } from 'src/model/auth/response/LoginUserResponse';
 import { TokenCreateResponse } from 'src/model/auth/response/TokenCreateResponse';
 import { UserSearchResponse } from 'src/model/user/response/UserSearchResponse';
-import { TokenDeleteResponse } from 'src/model/auth/response/TokenDeleteResponse';
+import { TokenDestroyResponse } from 'src/model/auth/response/TokenDeleteResponse';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -68,9 +68,7 @@ export class AuthController {
   }
 
   @Post('/logout')
-  async logoutUser(
-    @Body() data: { id: string },
-  ): Promise<Response<{ logout: boolean }>> {
+  async logoutUser(@Body() data: { id: string }): Promise<Response<boolean>> {
     const getUserResponse: UserSearchResponse = await firstValueFrom(
       this.userServiceClient.send(USER_SEARCH_BY_ID, data),
     );
@@ -80,27 +78,15 @@ export class AuthController {
         message: 'logout_user_error',
         status: getUserResponse.status,
         errors: getUserResponse.errors,
-        data: { logout: false },
+        data: false,
       };
 
-    const deleteTokenResponse: TokenDeleteResponse = await firstValueFrom(
+    const destroyTokenResponse: TokenDestroyResponse = await firstValueFrom(
       this.tokenServiceClient.send(TOKEN_DESTROY, {
         id: getUserResponse.data.user.id,
       }),
     );
 
-    if (!isOk(deleteTokenResponse.status))
-      return {
-        message: 'logout_token_error',
-        status: deleteTokenResponse.status,
-        errors: deleteTokenResponse.errors,
-        data: { logout: false },
-      };
-
-    return {
-      message: 'logout_success',
-      status: deleteTokenResponse.status,
-      data: { logout: true },
-    };
+    return destroyTokenResponse;
   }
 }
