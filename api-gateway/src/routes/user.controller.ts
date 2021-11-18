@@ -41,12 +41,6 @@ export class UserController {
 
   @Post('/role')
   async addRoleToUser(@Body() data: { userId: string; roleId: string }) {
-    const response = await firstValueFrom(
-      this.userServiceClient.send(USER_ADD_ROLE, data),
-    );
-
-    console.log('response', response);
-
-    return response;
+    return firstValueFrom(this.userServiceClient.send(USER_ADD_ROLE, data));
   }
 }

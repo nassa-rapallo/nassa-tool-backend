@@ -2,10 +2,9 @@ import { Response } from 'src/lib/Response';
 import {
   Body,
   Controller,
-  HttpException,
-  HttpStatus,
   Inject,
   Post,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
@@ -23,7 +22,10 @@ import { TokenCreateResponse } from 'src/modules/token/model/response/TokenCreat
 import { UserSearchResponse } from 'src/modules/user/model/response/UserSearchResponse';
 import { TokenDestroyResponse } from 'src/modules/token/model/response/TokenDeleteResponse';
 import { LoginResponseType } from 'src/modules/auth/swagger/LoginResponseType';
+import { LogoutResponseType } from 'src/modules/auth/swagger/LogoutResponseType';
+import { ResponseInterceptor } from 'src/services/interceptor/response.interceptor';
 
+@UseInterceptors(ResponseInterceptor)
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
@@ -44,14 +46,12 @@ export class AuthController {
     );
 
     if (!isOk(getUserResponse.status))
-      throw new HttpException(
-        {
-          message: getUserResponse.message,
-          data: null,
-          errors: getUserResponse.errors,
-        },
-        HttpStatus.UNAUTHORIZED,
-      );
+      return {
+        status: getUserResponse.status,
+        message: 'login_user_error',
+        data: null,
+        errors: getUserResponse.errors,
+      };
 
     const createTokenResponse: TokenCreateResponse = await firstValueFrom(
       this.tokenServiceClient.send(TOKEN_CREATE, {
@@ -61,14 +61,18 @@ export class AuthController {
 
     return {
       status: createTokenResponse.status,
-      message: 'login_success',
-      data: {
-        token: createTokenResponse.data.token,
-      },
+      message: isOk(createTokenResponse.status)
+        ? 'login_success'
+        : 'login_failure',
+      data: createTokenResponse.data,
+      errors: createTokenResponse.errors,
     };
   }
 
   @Post('/logout')
+  @ApiCreatedResponse({
+    type: LogoutResponseType,
+  })
   async logoutUser(@Body() data: { id: string }): Promise<Response<boolean>> {
     const getUserResponse: UserSearchResponse = await firstValueFrom(
       this.userServiceClient.send(USER_SEARCH_BY_ID, data),
@@ -88,6 +92,13 @@ export class AuthController {
       }),
     );
 
-    return destroyTokenResponse;
+    return {
+      status: destroyTokenResponse.status,
+      message: isOk(destroyTokenResponse.status)
+        ? 'logout_user_success'
+        : 'logout_user_failure',
+      errors: destroyTokenResponse.errors,
+      data: destroyTokenResponse.data,
+    };
   }
 }
