@@ -4,6 +4,7 @@ import { User } from 'src/entities/user.entity';
 import { createUserDto } from 'src/model/createUserDto';
 import { Repository } from 'typeorm';
 import { verify } from 'argon2';
+import { SECTIONS } from 'src/entities/role.entity';
 
 @Injectable()
 export class UserService {
@@ -35,5 +36,10 @@ export class UserService {
 
   async verifyPassword(user: User, password: string): Promise<boolean> {
     return verify(user.password, password);
+  }
+
+  async isAdmin(user: User, section: string = SECTIONS.ALL): Promise<boolean> {
+    const userRole = user.roles.find((role) => role.section === section);
+    return userRole ? userRole.isAdmin : false;
   }
 }

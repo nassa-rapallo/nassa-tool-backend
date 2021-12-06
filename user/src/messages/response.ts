@@ -4,6 +4,7 @@ const USER_DEFAULT = {
   SEARCH_BY_CREDENTIALS: 'user_search_by_credentials_',
   SEARCH_BY_ID: 'user_search_by_id_',
   ADD_ROLE_TO_USER: 'user_add_role_to_user_',
+  IS_ADMIN: 'user_is_admin_',
 };
 
 export const CREATE_USER = {
@@ -29,6 +30,11 @@ export const ADD_ROLE_TO_USER = {
   ROLE_NOT_FOUND: USER_DEFAULT.ADD_ROLE_TO_USER + 'role_not_found',
   BAD_REQUEST: USER_DEFAULT.ADD_ROLE_TO_USER + 'bad_request',
   SUCCESS: USER_DEFAULT.ADD_ROLE_TO_USER + 'success',
+};
+
+export const IS_ADMIN = {
+  UNAUTHORIZED: USER_DEFAULT.IS_ADMIN + 'unauthorized',
+  OK: USER_DEFAULT.IS_ADMIN + 'ok',
 };
 
 // ROLES RESPONSE MESSAGES

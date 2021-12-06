@@ -25,6 +25,9 @@ export class Role {
   })
   section: SECTIONS;
 
+  @Column('boolean', { default: false })
+  isAdmin: boolean;
+
   @Column({ nullable: false })
   name: string;
 

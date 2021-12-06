@@ -8,18 +8,22 @@ import {
   USER_ADD_ROLE,
   USER_CREATE,
   USER_GET_ALL,
+  USER_IS_ADMIN,
   USER_SEARCH_BY_CREDENTIALS,
   USER_SEARCH_BY_ID,
 } from '../messages/command';
 import {
   ADD_ROLE_TO_USER,
   CREATE_USER,
+  IS_ADMIN,
   SEARCH_BY_CREDENTIALS,
   SEARCH_BY_ID,
 } from '../messages/response';
 import { UserSearchResponse } from '../responses/UserResponses';
 import { RoleService } from 'src/services/role.service';
 import { Connection } from 'typeorm';
+import { User } from 'src/entities/user.entity';
+import { Response } from 'src/responses/Response';
 
 @Controller()
 export class UserController {
@@ -213,5 +217,25 @@ export class UserController {
         data: null,
       };
     }
+  }
+
+  @MessagePattern(USER_IS_ADMIN)
+  public async isAdmin(
+    @Payload() data: { user: User; section?: string },
+  ): Promise<Response<{ admin: boolean }>> {
+    const isAdmin = await this.userService.isAdmin(data.user, data.section);
+
+    if (!isAdmin)
+      return {
+        status: HttpStatus.FORBIDDEN,
+        message: IS_ADMIN.UNAUTHORIZED,
+        data: { admin: false },
+      };
+
+    return {
+      status: HttpStatus.OK,
+      message: IS_ADMIN.OK,
+      data: { admin: true },
+    };
   }
 }

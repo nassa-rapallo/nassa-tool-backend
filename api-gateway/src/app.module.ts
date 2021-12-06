@@ -9,6 +9,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './services/guards/authorization.guard';
 import { HelloController } from './routes/hello.controller';
 import { RoleController } from './routes/role.controller';
+import { ValidationGuard } from './services/guards/validation.guard';
 
 @Module({
   imports: [],
@@ -79,6 +80,10 @@ import { RoleController } from './routes/role.controller';
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ValidationGuard,
     },
   ],
 })
