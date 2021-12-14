@@ -26,9 +26,7 @@ export class AuthGuard implements CanActivate {
       context.getHandler(),
     );
 
-    if (!secured) {
-      return true;
-    }
+    if (!secured) return true;
 
     const request = context.switchToHttp().getRequest();
     const userTokenInfo = await firstValueFrom(

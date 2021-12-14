@@ -52,6 +52,11 @@ export class ValidationGuard implements CanActivate {
       context.getHandler(),
     );
 
+    // if there is no permission decorator on the request, then
+    // the guard should run its checks
+    if (!permission) return true;
+
+    // if there is permission decorator, the user needs to be logged in
     if (!request.user) return false;
 
     const isAdmin = await this.isAdmin(request.user);

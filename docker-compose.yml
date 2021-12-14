@@ -83,21 +83,7 @@ services:
       - token-postgres
       - backend
 
-  #RABBITMQ CONFIGURATION
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    hostname: rabbitmq
-    volumes:
-      - /var/lib/rabbitmq
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    env_file:
-      - .env
-    networks:
-      - backend
-
+# PERMISSION SERVICE CONFIGURATION
   permission:
     build:
       context: "."
@@ -130,6 +116,7 @@ services:
       - permission-postgres
       - backend
 
+# MAILER SERVICE CONFIGURATION
   mailer:
     build:
       context: "."
@@ -144,6 +131,23 @@ services:
       - "7103:7103"
     volumes:
       - ./mailer:/opt/app
+    networks:
+      - backend
+
+#RABBITMQ CONFIGURATION
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    hostname: rabbitmq
+    volumes:
+      - /var/lib/rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    env_file:
+      - .env
+    networks:
+      - backend
 
   # NETWORKS
 networks:
