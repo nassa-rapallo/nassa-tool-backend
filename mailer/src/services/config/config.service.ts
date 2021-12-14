@@ -6,6 +6,7 @@ export type RabbitConf = {
 export type EnvConfig = {
   host?: string;
   rabbit?: RabbitConf;
+  isEmailDisabled?: boolean;
 };
 
 export class ConfigService {
@@ -18,6 +19,9 @@ export class ConfigService {
       host: process.env.RABBITMQ_FULL_HOST,
       queue: process.env.RABBITMQ_MAILER_QUEUE_NAME,
     };
+
+    this.envConfig.isEmailDisabled =
+      process.env.MAILER_DISABLED === 'false' ? false : true;
   }
 
   get<ReturnType>(key: keyof EnvConfig): ReturnType {

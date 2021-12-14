@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 
 import { MailerModule } from './mailer.module';
-import { ConfigService, RabbitConf } from './services/config.service';
+import { ConfigService, RabbitConf } from './services/config/config.service';
 
 async function bootstrap() {
   const rabbit = new ConfigService().get<RabbitConf>('rabbit');
