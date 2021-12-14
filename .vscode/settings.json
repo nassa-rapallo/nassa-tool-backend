@@ -3,6 +3,7 @@
     "./api-gateway",
     "./user",
     "./token",
+    "./mailer",
     "./permission"
   ],
   "workbench.colorCustomizations": {

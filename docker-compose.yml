@@ -130,6 +130,21 @@ services:
       - permission-postgres
       - backend
 
+  mailer:
+    build:
+      context: "."
+      dockerfile: "./mailer/Dockerfile"
+    depends_on:
+      - rabbitmq
+    links:
+      - rabbitmq
+    env_file:
+      - .env
+    ports:
+      - "7103:7103"
+    volumes:
+      - ./mailer:/opt/app
+
   # NETWORKS
 networks:
   backend:
