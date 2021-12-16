@@ -24,6 +24,7 @@ services:
       dockerfile: "./user/Dockerfile"
     depends_on:
       - rabbitmq
+      - mailer
       - user-db
     links:
       - rabbitmq

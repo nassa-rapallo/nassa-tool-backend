@@ -8,6 +8,9 @@ import { User } from './entities/user.entity';
 import { TypeOrmConfigService } from './services/config/typeorm-config.service';
 import { RoleService } from './services/role.service';
 import { RoleController } from './controllers/role.controller';
+import { MailerProvider } from './contants';
+import { LinkService } from './services/link.service';
+import { LinkController } from './controllers/link.controller';
 
 @Module({
   imports: [
@@ -16,7 +19,13 @@ import { RoleController } from './controllers/role.controller';
     }),
     TypeOrmModule.forFeature([User, Role]),
   ],
-  controllers: [UserController, RoleController],
-  providers: [ConfigService, UserService, RoleService],
+  controllers: [UserController, RoleController, LinkController],
+  providers: [
+    ConfigService,
+    UserService,
+    RoleService,
+    LinkService,
+    MailerProvider,
+  ],
 })
 export class UserModule {}

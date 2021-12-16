@@ -42,4 +42,8 @@ export class UserService {
     const userRole = user.roles.find((role) => role.section === section);
     return userRole ? userRole.isAdmin : false;
   }
+
+  async confirmUser(data: { id: string }): Promise<void> {
+    await this.userRepository.update({ id: data.id }, { confirmed: true });
+  }
 }

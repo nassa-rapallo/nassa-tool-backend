@@ -27,6 +27,9 @@ export class User {
   @Column()
   password: string;
 
+  @Column('boolean', { default: false })
+  confirmed: boolean;
+
   @Column({ default: DEFAULT_ROLE })
   default_role: string;
 

@@ -64,3 +64,13 @@ export const UPDATE_ROLE = {
   BAD_REQUEST: ROLE_DEFAULT.UPDATE_ROLE + 'bad_request',
   SUCCESS: ROLE_DEFAULT.UPDATE_ROLE + 'success',
 };
+
+// LINK RESPONSE MESSAGES
+const LINK_DEFAULT = {
+  CONFIRM_LINK: 'user_confirm_link',
+};
+
+export const CONFIRM_LINK = {
+  BAD_REQUEST: LINK_DEFAULT.CONFIRM_LINK + 'bad_request',
+  SUCCESS: LINK_DEFAULT.CONFIRM_LINK + 'success',
+};

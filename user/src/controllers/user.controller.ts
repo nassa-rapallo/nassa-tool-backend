@@ -1,6 +1,6 @@
 import { UserResponse } from './../responses/UserResponses';
-import { Controller, HttpStatus } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { Controller, HttpStatus, Inject } from '@nestjs/common';
+import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 import { UserService } from '../services/user.service';
 import { createUserDto } from '../model/createUserDto';
 import { UserCredentialsDto } from '../model/userCredentialsDto';
@@ -24,13 +24,19 @@ import { RoleService } from 'src/services/role.service';
 import { Connection } from 'typeorm';
 import { User } from 'src/entities/user.entity';
 import { Response } from 'src/responses/Response';
+import { LinkService } from 'src/services/link.service';
+import { TYPES } from 'src/entities/link.entity';
+import { MAILER_SERVICE } from 'src/contants';
+import { firstValueFrom } from 'rxjs';
 
 @Controller()
 export class UserController {
   constructor(
     private readonly connection: Connection,
+    @Inject(MAILER_SERVICE) private readonly mailerServiceClient: ClientProxy,
     private readonly roleService: RoleService,
     private readonly userService: UserService,
+    private readonly linkService: LinkService,
   ) {}
 
   @MessagePattern('hello_user')
@@ -51,6 +57,25 @@ export class UserController {
           message: CREATE_USER.BAD_REQUEST,
           data: null,
         };
+
+      const userLink = await this.linkService.createLink({
+        user_id: created.id,
+        type: TYPES.CONFIRM,
+      });
+
+      firstValueFrom(
+        this.mailerServiceClient.send('mailer_send_mail', {
+          to: created.email,
+          subject: 'Conferma Email',
+          html: `<center>
+              <b>Hi there, please confirm your email to use Smoothday.</b><br>
+              Use the following link for this.<br>
+              <a href="${this.linkService.getWebLink({
+                link: userLink.link,
+              })}"><b>Confirm The Email</b></a>
+              </center>`,
+        }),
+      );
 
       return {
         status: HttpStatus.CREATED,

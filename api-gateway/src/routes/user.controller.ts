@@ -12,6 +12,7 @@ import { firstValueFrom } from 'rxjs';
 import { ResponseInterceptor } from 'src/services/interceptor/response.interceptor';
 import {
   USER_ADD_ROLE,
+  USER_CONFIRM_LINK,
   USER_CREATE,
   USER_GET_ALL,
 } from '../clients/user/commands';
@@ -42,5 +43,10 @@ export class UserController {
   @Post('/role')
   async addRoleToUser(@Body() data: { userId: string; roleId: string }) {
     return firstValueFrom(this.userServiceClient.send(USER_ADD_ROLE, data));
+  }
+
+  @Post('/confirm')
+  async confirmUser(@Body() data: { link: string }) {
+    return firstValueFrom(this.userServiceClient.send(USER_CONFIRM_LINK, data));
   }
 }
