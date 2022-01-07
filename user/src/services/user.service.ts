@@ -28,7 +28,7 @@ export class UserService {
   }
 
   async searchById(data: { id: string }): Promise<User | undefined> {
-    return this.userRepository.findOne({
+    return this.userRepository.findOneOrFail({
       where: { id: data.id },
       relations: ['roles'],
     });
@@ -45,5 +45,22 @@ export class UserService {
 
   async confirmUser(data: { id: string }): Promise<void> {
     await this.userRepository.update({ id: data.id }, { confirmed: true });
+  }
+
+  async toggleChangingPassword(data: {
+    id: string;
+    operation: boolean;
+  }): Promise<void> {
+    await this.userRepository.update(
+      { id: data.id },
+      { changing_password: data.operation },
+    );
+  }
+
+  async updateUser(data: {
+    userId: string;
+    userData: Partial<User>;
+  }): Promise<void> {
+    await this.userRepository.update({ id: data.userId }, { ...data.userData });
   }
 }

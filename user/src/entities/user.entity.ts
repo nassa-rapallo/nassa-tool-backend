@@ -30,6 +30,9 @@ export class User {
   @Column('boolean', { default: false })
   confirmed: boolean;
 
+  @Column('boolean', { default: false })
+  changing_password: boolean;
+
   @Column({ default: DEFAULT_ROLE })
   default_role: string;
 

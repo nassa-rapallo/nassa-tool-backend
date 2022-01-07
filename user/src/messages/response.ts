@@ -5,6 +5,7 @@ const USER_DEFAULT = {
   SEARCH_BY_ID: 'user_search_by_id_',
   ADD_ROLE_TO_USER: 'user_add_role_to_user_',
   IS_ADMIN: 'user_is_admin_',
+  FORGOT_PASSOWRD: 'user_forgot_password_',
 };
 
 export const CREATE_USER = {
@@ -35,6 +36,11 @@ export const ADD_ROLE_TO_USER = {
 export const IS_ADMIN = {
   UNAUTHORIZED: USER_DEFAULT.IS_ADMIN + 'unauthorized',
   OK: USER_DEFAULT.IS_ADMIN + 'ok',
+};
+
+export const FORGOT_PASSWORD = {
+  OK: USER_DEFAULT.FORGOT_PASSOWRD + 'ok',
+  BAD_REQUEST: USER_DEFAULT.FORGOT_PASSOWRD + 'bad_request',
 };
 
 // ROLES RESPONSE MESSAGES

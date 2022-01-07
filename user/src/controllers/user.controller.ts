@@ -1,12 +1,13 @@
 import { UserResponse } from './../responses/UserResponses';
-import { Controller, HttpStatus, Inject } from '@nestjs/common';
-import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
+import { Controller, HttpStatus } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UserService } from '../services/user.service';
 import { createUserDto } from '../model/createUserDto';
 import { UserCredentialsDto } from '../model/userCredentialsDto';
 import {
   USER_ADD_ROLE,
   USER_CREATE,
+  USER_FORGOT_PASSWORD,
   USER_GET_ALL,
   USER_IS_ADMIN,
   USER_SEARCH_BY_CREDENTIALS,
@@ -15,6 +16,7 @@ import {
 import {
   ADD_ROLE_TO_USER,
   CREATE_USER,
+  FORGOT_PASSWORD,
   IS_ADMIN,
   SEARCH_BY_CREDENTIALS,
   SEARCH_BY_ID,
@@ -26,14 +28,11 @@ import { User } from 'src/entities/user.entity';
 import { Response } from 'src/responses/Response';
 import { LinkService } from 'src/services/link.service';
 import { TYPES } from 'src/entities/link.entity';
-import { MAILER_SERVICE } from 'src/contants';
-import { firstValueFrom } from 'rxjs';
 
 @Controller()
 export class UserController {
   constructor(
     private readonly connection: Connection,
-    @Inject(MAILER_SERVICE) private readonly mailerServiceClient: ClientProxy,
     private readonly roleService: RoleService,
     private readonly userService: UserService,
     private readonly linkService: LinkService,
@@ -63,24 +62,13 @@ export class UserController {
         type: TYPES.CONFIRM,
       });
 
-      firstValueFrom(
-        this.mailerServiceClient.send('mailer_send_mail', {
-          to: created.email,
-          subject: 'Conferma Email',
-          html: `<center>
-              <b>Hi there, please confirm your email to use Smoothday.</b><br>
-              Use the following link for this.<br>
-              <a href="${this.linkService.getWebLink({
-                link: userLink.link,
-              })}"><b>Confirm The Email</b></a>
-              </center>`,
-        }),
-      );
-
       return {
         status: HttpStatus.CREATED,
         message: CREATE_USER.CREATED,
-        data: { user: created },
+        data: {
+          user: created,
+          link: await this.linkService.getWebLink({ link: userLink.link }),
+        },
       };
     } catch (e) {
       return {
@@ -262,5 +250,34 @@ export class UserController {
       message: IS_ADMIN.OK,
       data: { admin: true },
     };
+  }
+
+  @MessagePattern(USER_FORGOT_PASSWORD)
+  public async forgotPassword(data: {
+    userId: string;
+  }): Promise<Response<{ link: string; email: string } | undefined>> {
+    try {
+      const user = await this.userService.searchById({ id: data.userId });
+
+      const passwordLink = await this.linkService.createLink({
+        user_id: user.id,
+        type: TYPES.PASSWORD,
+      });
+
+      return {
+        status: HttpStatus.OK,
+        message: FORGOT_PASSWORD.OK,
+        data: {
+          email: user.email,
+          link: await this.linkService.getWebLink({ link: passwordLink.link }),
+        },
+      };
+    } catch (e) {
+      return {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: FORGOT_PASSWORD.BAD_REQUEST,
+        data: undefined,
+      };
+    }
   }
 }

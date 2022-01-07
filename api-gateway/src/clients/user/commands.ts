@@ -5,3 +5,5 @@ export const USER_SEARCH_BY_ID = 'user_search_by_id';
 export const USER_ADD_ROLE = 'user_add_role';
 export const USER_IS_ADMIN = 'user_is_admin';
 export const USER_CONFIRM_LINK = 'user_confirm_link';
+export const USER_FORGOT_PASSWORD = 'user_forgot_password';
+export const USER_CHANGE_PASSWORD = 'user_change_password';

@@ -8,7 +8,6 @@ import { User } from './entities/user.entity';
 import { TypeOrmConfigService } from './services/config/typeorm-config.service';
 import { RoleService } from './services/role.service';
 import { RoleController } from './controllers/role.controller';
-import { MailerProvider } from './contants';
 import { LinkService } from './services/link.service';
 import { LinkController } from './controllers/link.controller';
 
@@ -20,12 +19,6 @@ import { LinkController } from './controllers/link.controller';
     TypeOrmModule.forFeature([User, Role]),
   ],
   controllers: [UserController, RoleController, LinkController],
-  providers: [
-    ConfigService,
-    UserService,
-    RoleService,
-    LinkService,
-    MailerProvider,
-  ],
+  providers: [ConfigService, UserService, RoleService, LinkService],
 })
 export class UserModule {}

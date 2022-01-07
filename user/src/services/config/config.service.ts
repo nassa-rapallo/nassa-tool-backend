@@ -1,7 +1,6 @@
 export type RabbitConf = {
   host: string;
   queue: string;
-  mailer: string;
 };
 
 export type EnvConfig = {
@@ -20,7 +19,6 @@ export class ConfigService {
     this.envConfig.rabbit = {
       host: process.env.RABBITMQ_FULL_HOST,
       queue: process.env.RABBITMQ_USER_QUEUE_NAME,
-      mailer: process.env.RABBITMQ_MAILER_QUEUE_NAME,
     };
   }
 
