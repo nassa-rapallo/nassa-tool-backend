@@ -24,7 +24,6 @@ import {
 import { UserSearchResponse } from '../responses/UserResponses';
 import { RoleService } from 'src/services/role.service';
 import { Connection } from 'typeorm';
-import { User } from 'src/entities/user.entity';
 import { Response } from 'src/responses/Response';
 import { LinkService } from 'src/services/link.service';
 import { TYPES } from 'src/entities/link.entity';
@@ -233,22 +232,31 @@ export class UserController {
 
   @MessagePattern(USER_IS_ADMIN)
   public async isAdmin(
-    @Payload() data: { user: User; section?: string },
+    @Payload() data: { userId: string; section?: string },
   ): Promise<Response<{ admin: boolean }>> {
-    const isAdmin = await this.userService.isAdmin(data.user, data.section);
+    try {
+      const user = await this.userService.searchById({ id: data.userId });
+      const isAdmin = await this.userService.isAdmin(user, data.section);
 
-    if (!isAdmin)
+      if (!isAdmin)
+        return {
+          status: HttpStatus.FORBIDDEN,
+          message: IS_ADMIN.UNAUTHORIZED,
+          data: { admin: false },
+        };
+
       return {
-        status: HttpStatus.FORBIDDEN,
-        message: IS_ADMIN.UNAUTHORIZED,
-        data: { admin: false },
+        status: HttpStatus.OK,
+        message: IS_ADMIN.OK,
+        data: { admin: true },
       };
-
-    return {
-      status: HttpStatus.OK,
-      message: IS_ADMIN.OK,
-      data: { admin: true },
-    };
+    } catch {
+      return {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: IS_ADMIN.ERROR,
+        data: undefined,
+      };
+    }
   }
 
   @MessagePattern(USER_FORGOT_PASSWORD)

@@ -36,6 +36,7 @@ export const ADD_ROLE_TO_USER = {
 export const IS_ADMIN = {
   UNAUTHORIZED: USER_DEFAULT.IS_ADMIN + 'unauthorized',
   OK: USER_DEFAULT.IS_ADMIN + 'ok',
+  ERROR: USER_DEFAULT.IS_ADMIN + 'error',
 };
 
 export const FORGOT_PASSWORD = {
