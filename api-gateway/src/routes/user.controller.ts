@@ -23,10 +23,6 @@ import {
 } from '../clients/user/commands';
 import { createUserDto } from '../modules/user/model/dto/CreateUserDto';
 import { MAILER_SEND } from 'src/clients/mailer/commands';
-import {
-  mailingContent,
-  MAILING_TYPES,
-} from 'src/clients/mailer/mailingContent';
 import { Response } from 'src/lib/Response';
 
 @UseInterceptors(ResponseInterceptor)
@@ -58,9 +54,8 @@ export class UserController {
         this.mailerServiceClient.send(MAILER_SEND, {
           to: userCreateResponse.data.user.email,
           subject: 'Conferma Email',
-          html: mailingContent(MAILING_TYPES.CREATE_USER, {
-            link: userCreateResponse.data.link,
-          }),
+          template: 'confirmation',
+          context: { link: userCreateResponse.data.link },
         }),
       );
     }
@@ -90,9 +85,8 @@ export class UserController {
         this.mailerServiceClient.send(MAILER_SEND, {
           to: forgotPasswordResponse.data.email,
           subject: 'Cambio Password',
-          html: mailingContent(MAILING_TYPES.FORGOT_PASSWORD, {
-            link: forgotPasswordResponse.data.link,
-          }),
+          template: 'forgotPassword',
+          context: { link: forgotPasswordResponse.data.link },
         }),
       );
     }
