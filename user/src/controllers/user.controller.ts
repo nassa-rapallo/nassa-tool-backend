@@ -49,7 +49,6 @@ export class UserController {
   ): Promise<UserResponse> {
     try {
       const created = await this.userService.createUser(createUser);
-
       if (!created)
         return {
           status: HttpStatus.BAD_REQUEST,

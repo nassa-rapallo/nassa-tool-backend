@@ -1,5 +1,4 @@
 import {
-  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -9,7 +8,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { hash } from 'argon2';
 import { Role } from './role.entity';
 import { DEFAULT_ROLE } from 'src/contants';
 
@@ -45,9 +43,4 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @BeforeInsert()
-  async hashPassword() {
-    this.password = await hash(this.password);
-  }
 }

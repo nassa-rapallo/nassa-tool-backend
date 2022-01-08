@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
 import { createUserDto } from 'src/model/createUserDto';
 import { Repository } from 'typeorm';
-import { verify } from 'argon2';
+import { hash, compare } from 'bcrypt';
 import { SECTIONS } from 'src/entities/role.entity';
 
 @Injectable()
@@ -13,7 +13,13 @@ export class UserService {
   ) {}
 
   async createUser(createUser: createUserDto): Promise<User> {
-    return this.userRepository.save({ ...createUser });
+    const hashed = await hash(createUser.password, 12);
+    const user = await this.userRepository.save({
+      ...createUser,
+      password: hashed,
+    });
+
+    return user;
   }
 
   async getUsers() {
@@ -35,7 +41,8 @@ export class UserService {
   }
 
   async verifyPassword(user: User, password: string): Promise<boolean> {
-    return verify(user.password, password);
+    const compared = await compare(password, user.password);
+    return compared;
   }
 
   async isAdmin(user: User, section: string = SECTIONS.ALL): Promise<boolean> {

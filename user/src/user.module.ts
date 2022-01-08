@@ -10,13 +10,14 @@ import { RoleService } from './services/role.service';
 import { RoleController } from './controllers/role.controller';
 import { LinkService } from './services/link.service';
 import { LinkController } from './controllers/link.controller';
+import { Link } from './entities/link.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
       useClass: TypeOrmConfigService,
     }),
-    TypeOrmModule.forFeature([User, Role]),
+    TypeOrmModule.forFeature([User, Role, Link]),
   ],
   controllers: [UserController, RoleController, LinkController],
   providers: [ConfigService, UserService, RoleService, LinkService],

@@ -2,8 +2,10 @@ import { Response } from 'src/lib/Response';
 import {
   Body,
   Controller,
+  HttpStatus,
   Inject,
   Post,
+  Req,
   UseInterceptors,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
@@ -24,6 +26,7 @@ import { TokenDestroyResponse } from 'src/modules/token/model/response/TokenDele
 import { LoginResponseType } from 'src/modules/auth/swagger/LoginResponseType';
 import { LogoutResponseType } from 'src/modules/auth/swagger/LogoutResponseType';
 import { ResponseInterceptor } from 'src/services/interceptor/response.interceptor';
+import { Authorization } from 'src/services/decorators/authorization.decorator';
 
 @UseInterceptors(ResponseInterceptor)
 @Controller('auth')
@@ -41,6 +44,7 @@ export class AuthController {
   async loginUser(
     @Body() loginRequest: LoginUserDto,
   ): Promise<LoginUserResponse> {
+    console.log('LOGIN-1', loginRequest);
     const getUserResponse: UserSearchResponse = await firstValueFrom(
       this.userServiceClient.send(USER_SEARCH_BY_CREDENTIALS, loginRequest),
     );
@@ -99,6 +103,23 @@ export class AuthController {
         : 'logout_user_failure',
       errors: destroyTokenResponse.errors,
       data: destroyTokenResponse.data,
+    };
+  }
+
+  @Post('/current')
+  @Authorization(true)
+  async current(@Req() req: any) {
+    if (req.user)
+      return {
+        status: HttpStatus.OK,
+        message: 'user_current',
+        data: { user: req.user },
+      };
+
+    return {
+      HttpStatus: HttpStatus.UNAUTHORIZED,
+      message: 'user_not_current',
+      data: undefined,
     };
   }
 }

@@ -4,8 +4,7 @@ export type RabbitConf = {
 };
 
 export type EnvConfig = {
-  host?: string;
-  gatewayPort?: string;
+  client?: string;
   rabbit?: RabbitConf;
 };
 
@@ -13,8 +12,7 @@ export class ConfigService {
   private readonly envConfig: EnvConfig = {};
 
   constructor() {
-    this.envConfig.host = process.env.HOST;
-    this.envConfig.gatewayPort = process.env.API_GATEWAY_PORT;
+    this.envConfig.client = process.env.CLIENT;
 
     this.envConfig.rabbit = {
       host: process.env.RABBITMQ_FULL_HOST,

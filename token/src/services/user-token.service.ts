@@ -27,16 +27,19 @@ export class UserTokenService {
   async decodeToken(data: {
     token: string;
   }): Promise<{ userId: string } | undefined> {
+    const tokenToCheck = data.token.replace('Bearer ', '');
+
     const tokenModel = await this.userTokenRepository.findOne({
-      token: data.token,
+      token: tokenToCheck,
     });
-    if (!tokenModel || !tokenModel[0]) return null;
+    if (!tokenModel) return null;
 
     try {
-      const tokenData = this.jwtService.decode(tokenModel[0].token) as {
+      const tokenData = this.jwtService.decode(tokenModel.token) as {
         exp: number;
         userId: any;
       };
+
       if (!tokenData || tokenData.exp <= Math.floor(+new Date() / 1000))
         return undefined;
       return {

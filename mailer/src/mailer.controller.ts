@@ -20,10 +20,12 @@ export class MailerController {
   }
 
   @MessagePattern(MAILER_SEND)
-  mailSend(data: EmailData): MailResponse {
+  async mailSend(data: EmailData): Promise<MailResponse> {
     if (!this.configService.get('isEmailDisabled')) {
-      this.mailerService.sendMail(data);
+      const result = await this.mailerService.sendMail(data);
+      console.log('------RES', result);
     }
+    console.log('------ HERE ');
     return {
       status: HttpStatus.ACCEPTED,
       message: SEND_MAIL.ACCEPTED,

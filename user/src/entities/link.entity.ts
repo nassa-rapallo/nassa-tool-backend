@@ -1,5 +1,4 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { v4 as uuid } from 'uuid';
 
 export enum TYPES {
   CONFIRM = 'CONFIRM',
@@ -14,7 +13,7 @@ export class Link {
   @Column({ nullable: false })
   user_id: string;
 
-  @Column({ nullable: false, unique: true, default: uuid() })
+  @Column({ nullable: false, unique: true })
   link: string;
 
   @Column('boolean', { default: false })

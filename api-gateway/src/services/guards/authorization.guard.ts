@@ -39,7 +39,7 @@ export class AuthGuard implements CanActivate {
       throw new HttpException(
         {
           message: userTokenInfo.message,
-          data: null,
+          data: undefined,
           errors: null,
         },
         userTokenInfo.status,
@@ -47,10 +47,11 @@ export class AuthGuard implements CanActivate {
     }
 
     const userInfo = await firstValueFrom(
-      this.userServiceClient.send(USER_SEARCH_BY_ID, userTokenInfo.data.userId),
+      this.userServiceClient.send(USER_SEARCH_BY_ID, {
+        id: userTokenInfo.data.userId,
+      }),
     );
-
-    request.user = userInfo.user;
+    request.user = userInfo.data.user;
     return true;
   }
 }
