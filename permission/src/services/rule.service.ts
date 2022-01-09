@@ -36,8 +36,8 @@ export class RuleService {
     return this.ruleRepository.findOneOrFail({ id: data.id });
   }
 
-  async getRuleByAction(data: { action: string }): Promise<Rule[]> {
-    return this.ruleRepository.find({ where: { action: data.action } });
+  async getRuleByAction(data: { action: string }): Promise<Rule> {
+    return this.ruleRepository.findOne({ where: { action: data.action } });
   }
 
   async deleteRule(data: { id: string }): Promise<void> {

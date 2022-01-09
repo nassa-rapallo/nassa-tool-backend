@@ -24,7 +24,7 @@ export class SectionService {
   }
 
   async getSectionByName(data: { name: string }): Promise<Section> {
-    return this.sectionRepository.findOneOrFail({ name: data.name });
+    return this.sectionRepository.findOne({ name: data.name });
   }
 
   async getSectionByColumn(data: {
