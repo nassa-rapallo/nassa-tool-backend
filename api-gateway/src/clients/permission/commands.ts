@@ -11,3 +11,8 @@ export const SECTION_CREATE = 'permission_create_section';
 export const SECTION_GET_ALL = 'permission_get_all_sections';
 export const SECTION_GET_BY_ID = 'permission_get_section_by_id';
 export const SECTION_GET_BY_NAME = 'permission_get_section_by_name';
+
+// PERMISSION
+export const PERMISSION_CREATE = 'permission_create_permission';
+export const PERMISSION_GET_ROLES_FOR_RULE = 'permission_get_roles_for_rule';
+export const PERMISSION_IS_PERMITTED = 'permission_is_permitted';
