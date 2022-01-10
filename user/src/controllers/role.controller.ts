@@ -4,7 +4,10 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 import { Controller, HttpStatus } from '@nestjs/common';
 import { ROLE_GET_ALL } from 'src/messages/command';
 import { RoleService } from 'src/services/role.service';
-import { AllRolesResponse, RoleResponse } from 'src/responses/RoleResponses';
+import {
+  RoleSearchAllResponse,
+  RoleResponse,
+} from 'src/responses/RoleResponses';
 import { GET_ALL_ROLES } from 'src/messages/response';
 import { RoleDto } from 'src/model/role/RoleDto';
 import { UpdateRoleDto } from 'src/model/role/UpdateRoleDto';
@@ -14,7 +17,7 @@ export class RoleController {
   constructor(private readonly roleService: RoleService) {}
 
   @MessagePattern(ROLE_GET_ALL)
-  async getAllRoles(): AllRolesResponse {
+  async getAllRoles(): RoleSearchAllResponse {
     const roles = await this.roleService.getRoles();
     if (!roles)
       return {

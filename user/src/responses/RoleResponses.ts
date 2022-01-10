@@ -3,6 +3,6 @@ import { Response } from './Response';
 
 export type RoleResponse = Promise<Response<{ role: Partial<Role> }>>;
 
-export type AllRolesResponse = Promise<
+export type RoleSearchAllResponse = Promise<
   Response<{ roles: Array<Partial<Role>> }>
 >;
