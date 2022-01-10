@@ -30,9 +30,11 @@ import {
   UserResponse,
   ConfirmUserResponse,
   ForgotPasswordResponse,
+  ChangePasswordResponse,
 } from 'src/modules/user/model/responses';
 import { ConfirmUserDto } from 'src/modules/user/model/dto/ConfirmUserDto';
 import { ForgotPasswordDto } from 'src/modules/user/model/dto/ForgotPasswordDto';
+import { ChangePasswordDto } from 'src/modules/user/model/dto/ChangePasswordDto';
 
 @UseInterceptors(ResponseInterceptor)
 @Controller('users')
@@ -122,10 +124,13 @@ export class UserController {
 
   @Put('/change-password')
   async changePassword(
-    @Body() data: { userId: string; link: string; newPassword: string },
-  ) {
+    @Body() data: ChangePasswordDto,
+  ): ChangePasswordResponse {
     return firstValueFrom(
-      this.userServiceClient.send(USER_CHANGE_PASSWORD, data),
+      this.userServiceClient.send<ChangePasswordResponse, ChangePasswordDto>(
+        USER_CHANGE_PASSWORD,
+        data,
+      ),
     );
   }
 }
