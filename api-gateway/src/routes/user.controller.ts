@@ -1,4 +1,3 @@
-import { ConfirmUserResponse } from './../modules/user/model/responses';
 import { MAILER_SERVICE, TOKEN_SERVICE, USER_SERVICE } from 'src/clients';
 import {
   Body,
@@ -23,15 +22,17 @@ import {
 } from '../clients/user/commands';
 import { CreateUserDto } from '../modules/user/model/dto/CreateUserDto';
 import { MAILER_SEND } from 'src/clients/mailer/commands';
-import { Response } from 'src/lib/Response';
 import { MailResponse } from 'src/modules/mailer/model/response/MailResponse';
 import { SendMailDto } from 'src/modules/mailer/model/dto/SendMailDto';
 import { AddRoleDto } from 'src/modules/user/model/dto/AddRoleDto';
 import {
   UserLinkResponse,
   UserResponse,
+  ConfirmUserResponse,
+  ForgotPasswordResponse,
 } from 'src/modules/user/model/responses';
 import { ConfirmUserDto } from 'src/modules/user/model/dto/ConfirmUserDto';
+import { ForgotPasswordDto } from 'src/modules/user/model/dto/ForgotPasswordDto';
 
 @UseInterceptors(ResponseInterceptor)
 @Controller('users')
@@ -95,15 +96,19 @@ export class UserController {
   }
 
   @Post('/forgot-password')
-  async forgotPassword(@Body() data: { userId: string }) {
-    const forgotPasswordResponse: Response<{ email: string; link: string }> =
-      await firstValueFrom(
-        this.userServiceClient.send(USER_FORGOT_PASSWORD, data),
-      );
+  async forgotPassword(
+    @Body() data: ForgotPasswordDto,
+  ): ForgotPasswordResponse {
+    const forgotPasswordResponse = await firstValueFrom(
+      this.userServiceClient.send<ForgotPasswordResponse, ForgotPasswordDto>(
+        USER_FORGOT_PASSWORD,
+        data,
+      ),
+    );
 
     if (forgotPasswordResponse.data && forgotPasswordResponse.data.link) {
       await firstValueFrom(
-        this.mailerServiceClient.send(MAILER_SEND, {
+        this.mailerServiceClient.send<void, SendMailDto>(MAILER_SEND, {
           to: forgotPasswordResponse.data.email,
           subject: 'Cambio Password',
           template: 'forgotPassword',

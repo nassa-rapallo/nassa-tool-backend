@@ -9,7 +9,7 @@ import { IsAdminDto } from 'src/model/userAuth/IsAdminDto';
 import { ForgotPasswordDto } from 'src/model/userAuth/ForgotPasswordDto';
 import { TYPES } from 'src/entities/link.entity';
 import {
-  ForgotAdminResponse,
+  ForgotPasswordResponse,
   IsAdminResponse,
 } from 'src/responses/UserAuthResponses';
 
@@ -49,7 +49,7 @@ export class LinkController {
   }
 
   @MessagePattern(USER_FORGOT_PASSWORD)
-  public async forgotPassword(data: ForgotPasswordDto): ForgotAdminResponse {
+  public async forgotPassword(data: ForgotPasswordDto): ForgotPasswordResponse {
     try {
       const user = await this.userService.searchById({ id: data.userId });
 

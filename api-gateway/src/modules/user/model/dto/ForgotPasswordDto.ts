@@ -1,5 +1,6 @@
 import { IsString } from 'class-validator';
-export class ConfirmUserDto {
+
+export class ForgotPasswordDto {
   @IsString()
-  link: string;
+  id: string;
 }
