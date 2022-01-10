@@ -31,6 +31,7 @@ import {
   ConfirmUserResponse,
   ForgotPasswordResponse,
   ChangePasswordResponse,
+  UserSearchAllResponse,
 } from 'src/modules/user/model/responses';
 import { ConfirmUserDto } from 'src/modules/user/model/dto/ConfirmUserDto';
 import { ForgotPasswordDto } from 'src/modules/user/model/dto/ForgotPasswordDto';
@@ -50,8 +51,10 @@ export class UserController {
     description: 'Get All Users',
   })
   @Get()
-  async getUsers() {
-    return firstValueFrom(this.userServiceClient.send(USER_GET_ALL, {}));
+  async getUsers(): UserSearchAllResponse {
+    return firstValueFrom(
+      this.userServiceClient.send<UserSearchAllResponse>(USER_GET_ALL, {}),
+    );
   }
 
   @Post()

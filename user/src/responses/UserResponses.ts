@@ -8,3 +8,5 @@ export type UserLinkResponse = Promise<
 >;
 
 export type UserSearchResponse = Promise<Response<{ user: Partial<User> }>>;
+
+export type UserSearchAllResponse = Promise<Response<{ users: User[] }>>;

@@ -1,4 +1,8 @@
-import { UserLinkResponse, UserResponse } from './../responses/UserResponses';
+import {
+  UserLinkResponse,
+  UserResponse,
+  UserSearchAllResponse,
+} from './../responses/UserResponses';
 import { Controller, HttpStatus } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UserService } from '../services/user.service';
@@ -74,7 +78,7 @@ export class UserController {
   }
 
   @MessagePattern(USER_GET_ALL)
-  async getAllUsers() {
+  async getAllUsers(): UserSearchAllResponse {
     try {
       const users = await this.userService.getUsers();
 
