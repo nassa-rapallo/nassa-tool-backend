@@ -1,32 +1,29 @@
-import { UserResponse } from './../responses/UserResponses';
+import { UserLinkResponse, UserResponse } from './../responses/UserResponses';
 import { Controller, HttpStatus } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UserService } from '../services/user.service';
-import { createUserDto } from '../model/createUserDto';
-import { UserCredentialsDto } from '../model/userCredentialsDto';
+import { CreateUserDto } from '../model/user/CreateUserDto';
+import { UserCredentialsDto } from '../model/user/UserCredentialsDto';
 import {
   USER_ADD_ROLE,
   USER_CREATE,
-  USER_FORGOT_PASSWORD,
   USER_GET_ALL,
-  USER_IS_ADMIN,
   USER_SEARCH_BY_CREDENTIALS,
   USER_SEARCH_BY_ID,
 } from '../messages/command';
 import {
   ADD_ROLE_TO_USER,
   CREATE_USER,
-  FORGOT_PASSWORD,
-  IS_ADMIN,
   SEARCH_BY_CREDENTIALS,
   SEARCH_BY_ID,
 } from '../messages/response';
 import { UserSearchResponse } from '../responses/UserResponses';
 import { RoleService } from 'src/services/role.service';
 import { Connection } from 'typeorm';
-import { Response } from 'src/responses/Response';
 import { LinkService } from 'src/services/link.service';
 import { TYPES } from 'src/entities/link.entity';
+import { AddRoleDto } from 'src/model/user/AddRoleDto';
+import { GetByIdDto } from 'src/model/GetByIdDto';
 
 @Controller()
 export class UserController {
@@ -43,9 +40,7 @@ export class UserController {
   }
 
   @MessagePattern(USER_CREATE)
-  async createUser(
-    @Payload() createUser: createUserDto,
-  ): Promise<UserResponse> {
+  async createUser(@Payload() createUser: CreateUserDto): UserLinkResponse {
     try {
       const created = await this.userService.createUser(createUser);
       if (!created)
@@ -100,7 +95,7 @@ export class UserController {
   @MessagePattern(USER_SEARCH_BY_CREDENTIALS)
   async getUserByCredentials(
     @Payload() userCredentials: UserCredentialsDto,
-  ): Promise<UserSearchResponse> {
+  ): UserSearchResponse {
     // WRONG REQUEST
     if (!userCredentials || !userCredentials.email || !userCredentials.password)
       return {
@@ -152,9 +147,7 @@ export class UserController {
   }
 
   @MessagePattern(USER_SEARCH_BY_ID)
-  public async getUserById(
-    @Payload() data: { id: string },
-  ): Promise<UserSearchResponse> {
+  public async getUserById(@Payload() data: GetByIdDto): UserSearchResponse {
     // WRONG DATA
     if (!data.id)
       return {
@@ -182,9 +175,7 @@ export class UserController {
   }
 
   @MessagePattern(USER_ADD_ROLE)
-  public async addRoleToUser(
-    @Payload() data: { userId: string; roleId: string },
-  ): Promise<UserResponse> {
+  public async addRoleToUser(@Payload() data: AddRoleDto): UserResponse {
     const user = await this.userService.searchById({ id: data.userId });
     if (!user)
       return {
@@ -226,64 +217,6 @@ export class UserController {
         status: HttpStatus.BAD_REQUEST,
         message: ADD_ROLE_TO_USER.BAD_REQUEST,
         data: null,
-      };
-    }
-  }
-
-  @MessagePattern(USER_IS_ADMIN)
-  public async isAdmin(
-    @Payload() data: { userId: string; section?: string },
-  ): Promise<Response<{ admin: boolean }>> {
-    try {
-      const user = await this.userService.searchById({ id: data.userId });
-      const isAdmin = await this.userService.isAdmin(user, data.section);
-
-      if (!isAdmin)
-        return {
-          status: HttpStatus.FORBIDDEN,
-          message: IS_ADMIN.UNAUTHORIZED,
-          data: { admin: false },
-        };
-
-      return {
-        status: HttpStatus.OK,
-        message: IS_ADMIN.OK,
-        data: { admin: true },
-      };
-    } catch {
-      return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: IS_ADMIN.ERROR,
-        data: undefined,
-      };
-    }
-  }
-
-  @MessagePattern(USER_FORGOT_PASSWORD)
-  public async forgotPassword(data: {
-    userId: string;
-  }): Promise<Response<{ link: string; email: string } | undefined>> {
-    try {
-      const user = await this.userService.searchById({ id: data.userId });
-
-      const passwordLink = await this.linkService.createLink({
-        user_id: user.id,
-        type: TYPES.PASSWORD,
-      });
-
-      return {
-        status: HttpStatus.OK,
-        message: FORGOT_PASSWORD.OK,
-        data: {
-          email: user.email,
-          link: await this.linkService.getWebLink({ link: passwordLink.link }),
-        },
-      };
-    } catch (e) {
-      return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: FORGOT_PASSWORD.BAD_REQUEST,
-        data: undefined,
       };
     }
   }

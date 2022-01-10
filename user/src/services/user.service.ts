@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
-import { createUserDto } from 'src/model/createUserDto';
+import { CreateUserDto } from 'src/model/user/CreateUserDto';
 import { Repository } from 'typeorm';
 import { hash, compare } from 'bcrypt';
 import { SECTIONS } from 'src/entities/role.entity';
+import { GetByIdDto } from 'src/model/GetByIdDto';
+import { GetByEmailDto } from 'src/model/GetByEmailDto';
+import { ChangingPasswordDto } from 'src/model/user/ChangingPasswordDto';
+import { UpdateUserDto } from 'src/model/user/UpdateUserDto';
 
 @Injectable()
 export class UserService {
@@ -12,7 +16,7 @@ export class UserService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  async createUser(createUser: createUserDto): Promise<User> {
+  async createUser(createUser: CreateUserDto): Promise<User> {
     const hashed = await hash(createUser.password, 12);
     const user = await this.userRepository.save({
       ...createUser,
@@ -26,14 +30,14 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  async searchByEmail(data: { email: string }): Promise<User | undefined> {
+  async searchByEmail(data: GetByEmailDto): Promise<User | undefined> {
     return this.userRepository.findOne({
       where: { email: data.email },
       relations: ['roles'],
     });
   }
 
-  async searchById(data: { id: string }): Promise<User | undefined> {
+  async searchById(data: GetByIdDto): Promise<User | undefined> {
     return this.userRepository.findOneOrFail({
       where: { id: data.id },
       relations: ['roles'],
@@ -50,24 +54,18 @@ export class UserService {
     return userRole ? userRole.isAdmin : false;
   }
 
-  async confirmUser(data: { id: string }): Promise<void> {
+  async confirmUser(data: GetByIdDto): Promise<void> {
     await this.userRepository.update({ id: data.id }, { confirmed: true });
   }
 
-  async toggleChangingPassword(data: {
-    id: string;
-    operation: boolean;
-  }): Promise<void> {
+  async toggleChangingPassword(data: ChangingPasswordDto): Promise<void> {
     await this.userRepository.update(
       { id: data.id },
       { changing_password: data.operation },
     );
   }
 
-  async updateUser(data: {
-    userId: string;
-    userData: Partial<User>;
-  }): Promise<void> {
-    await this.userRepository.update({ id: data.userId }, { ...data.userData });
+  async updateUser(data: UpdateUserDto): Promise<void> {
+    await this.userRepository.update({ id: data.id }, { ...data.userData });
   }
 }

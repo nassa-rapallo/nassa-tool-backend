@@ -2,10 +2,13 @@ import { Controller, HttpStatus } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { USER_CHANGE_PASSWORD, USER_CONFIRM_LINK } from 'src/messages/command';
 import { CONFIRM_LINK } from 'src/messages/response';
-import { Response } from 'src/responses/Response';
 import { LinkService } from 'src/services/link.service';
 import { UserService } from 'src/services/user.service';
 import { hash } from 'argon2';
+import {
+  ChangePasswordResponse,
+  ConfirmUserResponse,
+} from 'src/responses/LinkResponses';
 
 @Controller()
 export class LinkController {
@@ -15,7 +18,7 @@ export class LinkController {
   ) {}
 
   @MessagePattern(USER_CONFIRM_LINK)
-  async confirmUser(data: { link: string }): Promise<Response<boolean>> {
+  async confirmUser(data: { link: string }): ConfirmUserResponse {
     try {
       const userLink = await this.linkService.getLink({ link: data.link });
       await this.linkService.useLink({ link: userLink.link });
@@ -24,13 +27,13 @@ export class LinkController {
       return {
         status: HttpStatus.OK,
         message: CONFIRM_LINK.SUCCESS,
-        data: true,
+        data: { confirmed: true },
       };
     } catch (e) {
       return {
         status: HttpStatus.BAD_REQUEST,
         message: CONFIRM_LINK.BAD_REQUEST,
-        data: false,
+        data: { confirmed: false },
       };
     }
   }
@@ -40,7 +43,7 @@ export class LinkController {
     userId: string;
     newPassword: string;
     link: string;
-  }): Promise<Response<boolean>> {
+  }): ChangePasswordResponse {
     try {
       const user = await this.userService.searchById({ id: data.userId });
 
@@ -48,13 +51,13 @@ export class LinkController {
         return {
           status: HttpStatus.BAD_REQUEST,
           message: 'not_changing_password',
-          data: false,
+          data: { changed: true },
         };
 
       const newPassword = await hash(data.newPassword);
 
       await this.userService.updateUser({
-        userId: user.id,
+        id: user.id,
         userData: { changing_password: false, password: newPassword },
       });
 
@@ -63,7 +66,7 @@ export class LinkController {
       return {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'error',
-        data: false,
+        data: { changed: false },
       };
     }
   }

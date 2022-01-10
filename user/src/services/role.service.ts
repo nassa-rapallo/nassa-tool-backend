@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Role, SECTIONS } from 'src/entities/role.entity';
+import { Role } from 'src/entities/role.entity';
 import { User } from 'src/entities/user.entity';
-import { RoleDto } from 'src/model/RoleDto';
+import { GetByIdDto } from 'src/model/GetByIdDto';
+import { GetBySectionDto } from 'src/model/role/GetBySectionDto';
+import { RoleDto } from 'src/model/role/RoleDto';
+import { UpdateRoleDto } from 'src/model/role/UpdateRoleDto';
 import { Connection, Repository } from 'typeorm';
 
 @Injectable()
@@ -20,13 +23,11 @@ export class RoleService {
     return this.roleRepository.findOne({ section, name });
   }
 
-  async getRoleById(data: { id: string }): Promise<Role | undefined> {
+  async getRoleById(data: GetByIdDto): Promise<Role | undefined> {
     return this.roleRepository.findOne({ id: data.id });
   }
 
-  async getRolesBySection(data: {
-    section: SECTIONS;
-  }): Promise<Role[] | undefined> {
+  async getRolesBySection(data: GetBySectionDto): Promise<Role[] | undefined> {
     return this.roleRepository.find({
       where: { section: data.section },
     });
@@ -41,10 +42,7 @@ export class RoleService {
     return this.roleRepository.save({ name: name, section: section });
   }
 
-  async updateRole(data: {
-    oldRole: RoleDto;
-    name: string;
-  }): Promise<Role | undefined> {
+  async updateRole(data: UpdateRoleDto): Promise<Role | undefined> {
     const roleToUpdate = await this.getRole(data.oldRole);
 
     if (!roleToUpdate) return undefined;

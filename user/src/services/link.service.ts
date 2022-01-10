@@ -1,8 +1,8 @@
-import { GetLinkDto } from './../model/getLinkDto';
+import { GetLinkDto } from '../model/link/GetLinkDto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Link } from 'src/entities/link.entity';
-import { CreateLinkDto } from 'src/model/createLinkDto';
+import { CreateLinkDto } from 'src/model/link/CreateLinkDto';
 import { Repository } from 'typeorm';
 import { ConfigService } from './config/config.service';
 import { v4 as uuid } from 'uuid';

@@ -6,14 +6,15 @@ import { ROLE_GET_ALL } from 'src/messages/command';
 import { RoleService } from 'src/services/role.service';
 import { AllRolesResponse, RoleResponse } from 'src/responses/RoleResponses';
 import { GET_ALL_ROLES } from 'src/messages/response';
-import { RoleDto } from 'src/model/RoleDto';
+import { RoleDto } from 'src/model/role/RoleDto';
+import { UpdateRoleDto } from 'src/model/role/UpdateRoleDto';
 
 @Controller()
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
 
   @MessagePattern(ROLE_GET_ALL)
-  async getAllRoles(): Promise<AllRolesResponse> {
+  async getAllRoles(): AllRolesResponse {
     const roles = await this.roleService.getRoles();
     if (!roles)
       return {
@@ -30,7 +31,7 @@ export class RoleController {
   }
 
   @MessagePattern(ROLE_GET)
-  async getRole(@Payload() roleDto: RoleDto): Promise<RoleResponse> {
+  async getRole(@Payload() roleDto: RoleDto): RoleResponse {
     const role = await this.roleService.getRole(roleDto);
 
     if (!role)
@@ -48,7 +49,7 @@ export class RoleController {
   }
 
   @MessagePattern(ROLE_CREATE)
-  async createRole(@Payload() roleDto: RoleDto): Promise<RoleResponse> {
+  async createRole(@Payload() roleDto: RoleDto): RoleResponse {
     const createdRole = await this.roleService.createRole(roleDto);
 
     if (!createdRole)
@@ -66,9 +67,7 @@ export class RoleController {
   }
 
   @MessagePattern(ROLE_UPDATE)
-  async updateRole(
-    @Payload() data: { oldRole: RoleDto; name: string },
-  ): Promise<RoleResponse> {
+  async updateRole(@Payload() data: UpdateRoleDto): RoleResponse {
     const updated = await this.roleService.updateRole(data);
 
     if (!updated)
