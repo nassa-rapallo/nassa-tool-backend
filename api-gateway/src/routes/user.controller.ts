@@ -1,3 +1,4 @@
+import { ConfirmUserResponse } from './../modules/user/model/responses';
 import { MAILER_SERVICE, TOKEN_SERVICE, USER_SERVICE } from 'src/clients';
 import {
   Body,
@@ -30,6 +31,7 @@ import {
   UserLinkResponse,
   UserResponse,
 } from 'src/modules/user/model/responses';
+import { ConfirmUserDto } from 'src/modules/user/model/dto/ConfirmUserDto';
 
 @UseInterceptors(ResponseInterceptor)
 @Controller('users')
@@ -83,8 +85,13 @@ export class UserController {
   }
 
   @Post('/confirm')
-  async confirmUser(@Body() data: { link: string }) {
-    return firstValueFrom(this.userServiceClient.send(USER_CONFIRM_LINK, data));
+  async confirmUser(@Body() data: ConfirmUserDto): ConfirmUserResponse {
+    return firstValueFrom(
+      this.userServiceClient.send<ConfirmUserResponse, ConfirmUserDto>(
+        USER_CONFIRM_LINK,
+        data,
+      ),
+    );
   }
 
   @Post('/forgot-password')
