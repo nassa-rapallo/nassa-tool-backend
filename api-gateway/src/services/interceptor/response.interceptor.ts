@@ -4,19 +4,17 @@ import {
   ExecutionContext,
   CallHandler,
   HttpException,
-  HttpStatus,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Response } from 'src/lib/Response';
 
 const EMPTY_ERRORS = [''];
-const GOOD_STATUS = [HttpStatus.OK, HttpStatus.FOUND, HttpStatus.CREATED];
 
 const handleResponse = (res: Response<unknown> | string) => {
   if (typeof res === 'string') return res;
 
-  if (GOOD_STATUS.includes(res.status)) return res;
+  if (res.status < 400 || res.statusCode < 400) return res;
 
   throw new HttpException(
     {
@@ -24,7 +22,7 @@ const handleResponse = (res: Response<unknown> | string) => {
       data: null,
       errors: res.errors ? res.errors : EMPTY_ERRORS,
     },
-    HttpStatus.NOT_FOUND,
+    res.status ? res.status : res.statusCode,
   );
 };
 

@@ -21,9 +21,11 @@ import {
   USER_FORGOT_PASSWORD,
   USER_CHANGE_PASSWORD,
 } from '../clients/user/commands';
-import { createUserDto } from '../modules/user/model/dto/CreateUserDto';
+import { CreateUserDto } from '../modules/user/model/dto/CreateUserDto';
 import { MAILER_SEND } from 'src/clients/mailer/commands';
 import { Response } from 'src/lib/Response';
+import { MailResponse } from 'src/modules/mailer/model/response/MailResponse';
+import { SendMailDto } from 'src/modules/mailer/model/dto/SendMailDto';
 
 @UseInterceptors(ResponseInterceptor)
 @Controller('users')
@@ -44,14 +46,19 @@ export class UserController {
   }
 
   @Post()
-  async createUser(@Body() createUser: createUserDto) {
-    const userCreateResponse: UserCreateResponse = await firstValueFrom(
-      this.userServiceClient.send(USER_CREATE, createUser),
+  async createUser(
+    @Body() createUser: CreateUserDto,
+  ): Promise<UserCreateResponse> {
+    const userCreateResponse = await firstValueFrom(
+      this.userServiceClient.send<UserCreateResponse, CreateUserDto>(
+        USER_CREATE,
+        createUser,
+      ),
     );
 
     if (userCreateResponse.data && userCreateResponse.data.link) {
       await firstValueFrom(
-        this.mailerServiceClient.send(MAILER_SEND, {
+        this.mailerServiceClient.send<MailResponse, SendMailDto>(MAILER_SEND, {
           to: userCreateResponse.data.user.email,
           subject: 'Conferma Email',
           template: 'confirmation',
