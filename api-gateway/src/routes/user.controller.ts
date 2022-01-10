@@ -11,7 +11,6 @@ import {
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { firstValueFrom } from 'rxjs';
-import { UserCreateResponse } from 'src/modules/user/model/response/UserCreateResponse';
 import { ResponseInterceptor } from 'src/services/interceptor/response.interceptor';
 import {
   USER_ADD_ROLE,
@@ -26,6 +25,11 @@ import { MAILER_SEND } from 'src/clients/mailer/commands';
 import { Response } from 'src/lib/Response';
 import { MailResponse } from 'src/modules/mailer/model/response/MailResponse';
 import { SendMailDto } from 'src/modules/mailer/model/dto/SendMailDto';
+import { AddRoleDto } from 'src/modules/user/model/dto/AddRoleDto';
+import {
+  UserLinkResponse,
+  UserResponse,
+} from 'src/modules/user/model/responses';
 
 @UseInterceptors(ResponseInterceptor)
 @Controller('users')
@@ -46,11 +50,9 @@ export class UserController {
   }
 
   @Post()
-  async createUser(
-    @Body() createUser: CreateUserDto,
-  ): Promise<UserCreateResponse> {
+  async createUser(@Body() createUser: CreateUserDto): UserLinkResponse {
     const userCreateResponse = await firstValueFrom(
-      this.userServiceClient.send<UserCreateResponse, CreateUserDto>(
+      this.userServiceClient.send<UserLinkResponse, CreateUserDto>(
         USER_CREATE,
         createUser,
       ),
@@ -71,8 +73,13 @@ export class UserController {
   }
 
   @Post('/role')
-  async addRoleToUser(@Body() data: { userId: string; roleId: string }) {
-    return firstValueFrom(this.userServiceClient.send(USER_ADD_ROLE, data));
+  async addRoleToUser(@Body() data: AddRoleDto) {
+    return firstValueFrom(
+      this.userServiceClient.send<UserResponse, AddRoleDto>(
+        USER_ADD_ROLE,
+        data,
+      ),
+    );
   }
 
   @Post('/confirm')
