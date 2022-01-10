@@ -9,6 +9,8 @@ import {
   ChangePasswordResponse,
   ConfirmUserResponse,
 } from 'src/responses/LinkResponses';
+import { ConfirmUserDto } from 'src/model/link/ConfirmUserDto';
+import { ChangePasswordDto } from 'src/model/link/ChangePasswordDto';
 
 @Controller()
 export class LinkController {
@@ -18,7 +20,7 @@ export class LinkController {
   ) {}
 
   @MessagePattern(USER_CONFIRM_LINK)
-  async confirmUser(data: { link: string }): ConfirmUserResponse {
+  async confirmUser(data: ConfirmUserDto): ConfirmUserResponse {
     try {
       const userLink = await this.linkService.getLink({ link: data.link });
       await this.linkService.useLink({ link: userLink.link });
@@ -39,13 +41,9 @@ export class LinkController {
   }
 
   @MessagePattern(USER_CHANGE_PASSWORD)
-  public async changePassword(data: {
-    userId: string;
-    newPassword: string;
-    link: string;
-  }): ChangePasswordResponse {
+  public async changePassword(data: ChangePasswordDto): ChangePasswordResponse {
     try {
-      const user = await this.userService.searchById({ id: data.userId });
+      const user = await this.userService.searchById({ id: data.id });
 
       if (!user.changing_password)
         return {
