@@ -11,6 +11,8 @@ import { PERMISSION_SERVICE } from 'src/clients';
 import { firstValueFrom } from 'rxjs';
 import { PERMISSION_CREATE } from 'src/clients/permission/commands';
 import { ResponseInterceptor } from 'src/services/interceptor/response.interceptor';
+import { CreatePermissionDto } from 'src/modules/permission/model/dto';
+import { CreatePermissionResponse } from 'src/modules/permission/model/responses';
 
 @UseInterceptors(ResponseInterceptor)
 @Controller('permission')
@@ -23,10 +25,13 @@ export class PermissionController {
 
   @Post('/')
   async createPermission(
-    @Body() data: { section: string; action: string; role: string },
-  ) {
-    await firstValueFrom(
-      this.permissionServiceClient.send(PERMISSION_CREATE, data),
+    @Body() data: CreatePermissionDto,
+  ): CreatePermissionResponse {
+    return firstValueFrom(
+      this.permissionServiceClient.send<
+        CreatePermissionResponse,
+        CreatePermissionDto
+      >(PERMISSION_CREATE, data),
     );
   }
 }
