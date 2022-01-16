@@ -20,11 +20,8 @@ import {
   USER_FORGOT_PASSWORD,
   USER_CHANGE_PASSWORD,
 } from '../clients/user/commands';
-import { CreateUserDto } from '../modules/user/model/dto/CreateUserDto';
 import { MAILER_SEND } from 'src/clients/mailer/commands';
 import { MailResponse } from 'src/modules/mailer/model/response/MailResponse';
-import { SendMailDto } from 'src/modules/mailer/model/dto/SendMailDto';
-import { AddRoleDto } from 'src/modules/user/model/dto/AddRoleDto';
 import {
   UserLinkResponse,
   UserResponse,
@@ -33,9 +30,14 @@ import {
   ChangePasswordResponse,
   UserSearchAllResponse,
 } from 'src/modules/user/model/responses';
-import { ConfirmUserDto } from 'src/modules/user/model/dto/ConfirmUserDto';
-import { ForgotPasswordDto } from 'src/modules/user/model/dto/ForgotPasswordDto';
-import { ChangePasswordDto } from 'src/modules/user/model/dto/ChangePasswordDto';
+import {
+  AddRoleDto,
+  ChangePasswordDto,
+  ConfirmUserDto,
+  CreateUserDto,
+  ForgotPasswordDto,
+} from 'src/modules/user/model/dto';
+import { SendMailDto } from 'src/modules/mailer/model/dto/SendMailDto';
 
 @UseInterceptors(ResponseInterceptor)
 @Controller('users')
