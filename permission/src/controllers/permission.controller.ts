@@ -4,13 +4,21 @@ import { Controller, HttpStatus } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { RuleService } from 'src/services/rule.service';
 import { PermissionService } from '../services/permission.service';
-import { GetRolesForRule } from 'src/model/permission/response/GetRolesForRule';
-import { CreatePermission } from 'src/model/permission/response/CreatePermission';
 import {
   PERMISSION_CREATE,
   PERMISSION_GET_ROLES_FOR_RULE,
 } from 'src/messages/command';
 import { CREATE_PERMISSION, GET_ROLES } from 'src/messages/response';
+import {
+  CreatePermissionResponse,
+  GetRolesForRuleResponse,
+  IsPermittedResponse,
+} from 'src/model/permission/responses';
+import {
+  CreatePermissionDto,
+  GetRolesDto,
+  IsPermittedDto,
+} from 'src/model/permission/dto';
 
 @Controller()
 export class PermissionController {
@@ -26,11 +34,7 @@ export class PermissionController {
   }
 
   @MessagePattern(PERMISSION_CREATE)
-  async createPermission(data: {
-    section: string;
-    action: string;
-    role: string;
-  }): Promise<CreatePermission> {
+  async createPermission(data: CreatePermissionDto): CreatePermissionResponse {
     try {
       // search for the section in the db
       let responseSection = await this.sectionService.getSectionByName({
@@ -84,9 +88,7 @@ export class PermissionController {
   }
 
   @MessagePattern(PERMISSION_GET_ROLES_FOR_RULE)
-  async getRolesForRule(
-    @Payload() data: { section: string; action: string },
-  ): Promise<GetRolesForRule> {
+  async getRolesForRule(@Payload() data: GetRolesDto): GetRolesForRuleResponse {
     try {
       const section = await this.sectionService.getSectionByName({
         name: data.section,
@@ -119,20 +121,30 @@ export class PermissionController {
   }
 
   @MessagePattern(PERMISSION_IS_PERMITTED)
-  async isPermitted(
-    @Payload() data: { roleId: string; section: string; action: string },
-  ): Promise<boolean> {
+  async isPermitted(@Payload() data: IsPermittedDto): IsPermittedResponse {
     const roles = await this.getRolesForRule({
       section: data.section,
       action: data.action,
     });
 
-    if (!roles.data) return false;
+    if (!roles.data) {
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        message: 'permission_role_is_not_permitted',
+        data: { permitted: false },
+      };
+    }
 
-    const isRolePermitted = roles.data.roles.findIndex(
-      (role) => role === data.roleId,
-    );
+    const isRolePermitted = roles.data.roles.find((role) => role === data.role)
+      ? true
+      : false;
 
-    return isRolePermitted < 0 ? false : true;
+    return {
+      status: HttpStatus.OK,
+      message: isRolePermitted
+        ? 'permisssion_is_permitted'
+        : 'permission_is_not_permitted',
+      data: { permitted: isRolePermitted },
+    };
   }
 }

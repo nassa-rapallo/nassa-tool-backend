@@ -1,4 +1,3 @@
-import { AllRulesResponse } from './../model/rule/response/AllRulesResponse';
 import {
   RULE_CREATE,
   RULE_DELETE,
@@ -8,19 +7,16 @@ import {
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { Controller, HttpStatus } from '@nestjs/common';
 import { RuleService } from 'src/services/rule.service';
-import { CreateRuleDto } from 'src/model/rule/dto/CreateRuleDto';
-import { RuleResponse } from 'src/model/rule/response/RuleResponse';
-import { UpdateRuleDto } from 'src/model/rule/dto/UpdateRuleDto';
 import { RULE_RESPONSE } from 'src/model/rule/messages/response';
+import { CreateRuleDto, UpdateRuleDto } from 'src/model/rule/dto';
+import { AllRulesResponse, RuleResponse } from 'src/model/rule/responses';
 
 @Controller()
 export class RuleController {
   constructor(private readonly ruleService: RuleService) {}
 
   @MessagePattern(RULE_CREATE)
-  async ruleCreate(
-    @Payload() createRuleDto: CreateRuleDto,
-  ): Promise<RuleResponse> {
+  async ruleCreate(@Payload() createRuleDto: CreateRuleDto): RuleResponse {
     try {
       const rule = await this.ruleService.createRule(createRuleDto);
 
@@ -39,7 +35,7 @@ export class RuleController {
     }
   }
 
-  async ruleGetAll(): Promise<AllRulesResponse> {
+  async ruleGetAll(): AllRulesResponse {
     try {
       const rules = await this.ruleService.getAll();
 

@@ -1,25 +1,25 @@
-import { SECTION_GET_BY_NAME } from './../model/section/messages/commands';
-import { AllSectionsResponse } from './../model/section/response/AllSectionsResponse';
 import { MessagePattern } from '@nestjs/microservices';
 import { Controller, HttpStatus } from '@nestjs/common';
 import { SectionService } from 'src/services/section.service';
 import {
+  SECTION_GET_BY_NAME,
   SECTION_CREATE,
   SECTION_GET_ALL,
   SECTION_GET_BY_ID,
 } from 'src/model/section/messages/commands';
-import { CreateSectionDto } from 'src/model/section/dto/CreateSectionDto';
-import { SectionResponse } from 'src/model/section/response/SectionResponse';
+import { CreateSectionDto } from 'src/model/section/dto';
 import { SECTION_RESPONSE } from 'src/model/section/messages/response';
+import {
+  AllSectionsResponse,
+  SectionResponse,
+} from 'src/model/section/responses';
 
 @Controller()
 export class SectionController {
   constructor(private readonly sectionService: SectionService) {}
 
   @MessagePattern(SECTION_CREATE)
-  async createSection(
-    createSectionDto: CreateSectionDto,
-  ): Promise<SectionResponse> {
+  async createSection(createSectionDto: CreateSectionDto): SectionResponse {
     try {
       const section = await this.sectionService.createSection(createSectionDto);
       return {
@@ -38,7 +38,7 @@ export class SectionController {
   }
 
   @MessagePattern(SECTION_GET_ALL)
-  async getAllSections(): Promise<AllSectionsResponse> {
+  async getAllSections(): AllSectionsResponse {
     try {
       const sections = await this.sectionService.getAllSections();
 
@@ -65,7 +65,7 @@ export class SectionController {
   }
 
   @MessagePattern(SECTION_GET_BY_ID)
-  async getById(data: { id: string }): Promise<SectionResponse> {
+  async getById(data: { id: string }): SectionResponse {
     try {
       const section = await this.sectionService.getSectionById({ id: data.id });
 
@@ -85,7 +85,7 @@ export class SectionController {
   }
 
   @MessagePattern(SECTION_GET_BY_NAME)
-  async getByName(data: { name: string }): Promise<SectionResponse> {
+  async getByName(data: { name: string }): SectionResponse {
     try {
       const section = await this.sectionService.getSectionByName({
         name: data.name,
