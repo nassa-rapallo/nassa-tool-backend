@@ -1,11 +1,14 @@
-import { TokenDestroyResponse } from '../responses/TokenDestroyResponse';
 import { Controller, HttpStatus } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { TOKEN_CREATE, TOKEN_DECODE, TOKEN_DESTROY } from '../messages/command';
 import { CREATE, DECODE, DESTROY } from '../messages/response';
-import { TokenResponse } from '../responses/TokenResponse';
-import { TokenDataResponse } from '../responses/TokenDataResponse';
 import { UserTokenService } from '../services/user-token.service';
+import {
+  TokenDataResponse,
+  TokenResponse,
+  TokenDestroyResponse,
+} from 'src/model/responses';
+import { CreateTokenDto, DecodeTokenDto, DestroyTokenDto } from 'src/model/dto';
 
 @Controller()
 export class UserTokenController {
@@ -17,9 +20,7 @@ export class UserTokenController {
   }
 
   @MessagePattern(TOKEN_CREATE)
-  async createToken(
-    @Payload() data: { userId: string },
-  ): Promise<TokenResponse> {
+  async createToken(@Payload() data: CreateTokenDto): TokenResponse {
     // WRONG DATA
     if (!data || !data.userId)
       return {
@@ -50,9 +51,7 @@ export class UserTokenController {
   }
 
   @MessagePattern(TOKEN_DECODE)
-  async decodeToken(
-    @Payload() data: { token: string },
-  ): Promise<TokenDataResponse> {
+  async decodeToken(@Payload() data: DecodeTokenDto): TokenDataResponse {
     const tokenData = await this.userTokenService.decodeToken({
       token: data.token,
     });
@@ -65,22 +64,20 @@ export class UserTokenController {
   }
 
   @MessagePattern(TOKEN_DESTROY)
-  public async destroyToken(data: {
-    userId: string;
-  }): Promise<TokenDestroyResponse> {
+  public async destroyToken(data: DestroyTokenDto): TokenDestroyResponse {
     try {
       await this.userTokenService.deleteTokenForUserId(data.userId);
 
       return {
         status: HttpStatus.OK,
         message: DESTROY.SUCCESS,
-        data: true,
+        data: { destroyed: true },
       };
     } catch (e) {
       return {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         message: DESTROY.FAILURE,
-        data: false,
+        data: { destroyed: false },
         errors: [e.driverError.detail],
       };
     }

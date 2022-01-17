@@ -20,13 +20,15 @@ import {
 import { isOk } from 'src/lib/responseCode';
 import { LoginUserDto } from 'src/modules/auth/model/dto/LoginUserDto';
 import { LoginUserResponse } from 'src/modules/auth/model/response/LoginUserResponse';
-import { TokenCreateResponse } from 'src/modules/token/model/response/TokenCreateResponse';
-import { UserSearchResponse } from 'src/modules/user/model/response/UserSearchResponse';
-import { TokenDestroyResponse } from 'src/modules/token/model/response/TokenDeleteResponse';
 import { LoginResponseType } from 'src/modules/auth/swagger/LoginResponseType';
 import { LogoutResponseType } from 'src/modules/auth/swagger/LogoutResponseType';
 import { ResponseInterceptor } from 'src/services/interceptor/response.interceptor';
 import { Authorization } from 'src/services/decorators/authorization.decorator';
+import { UserSearchResponse } from 'src/modules/user/model/responses';
+import {
+  TokenCreateResponse,
+  TokenDestroyResponse,
+} from 'src/modules/token/model/responses';
 
 @UseInterceptors(ResponseInterceptor)
 @Controller('auth')
@@ -44,9 +46,11 @@ export class AuthController {
   async loginUser(
     @Body() loginRequest: LoginUserDto,
   ): Promise<LoginUserResponse> {
-    console.log('LOGIN-1', loginRequest);
-    const getUserResponse: UserSearchResponse = await firstValueFrom(
-      this.userServiceClient.send(USER_SEARCH_BY_CREDENTIALS, loginRequest),
+    const getUserResponse = await firstValueFrom(
+      this.userServiceClient.send<UserSearchResponse>(
+        USER_SEARCH_BY_CREDENTIALS,
+        loginRequest,
+      ),
     );
 
     if (!isOk(getUserResponse.status))
@@ -57,8 +61,8 @@ export class AuthController {
         errors: getUserResponse.errors,
       };
 
-    const createTokenResponse: TokenCreateResponse = await firstValueFrom(
-      this.tokenServiceClient.send(TOKEN_CREATE, {
+    const createTokenResponse = await firstValueFrom(
+      this.tokenServiceClient.send<TokenCreateResponse>(TOKEN_CREATE, {
         userId: getUserResponse.data.user.id,
       }),
     );
@@ -77,9 +81,9 @@ export class AuthController {
   @ApiCreatedResponse({
     type: LogoutResponseType,
   })
-  async logoutUser(@Body() data: { id: string }): Promise<Response<boolean>> {
-    const getUserResponse: UserSearchResponse = await firstValueFrom(
-      this.userServiceClient.send(USER_SEARCH_BY_ID, data),
+  async logoutUser(@Body() data: { id: string }): TokenDestroyResponse {
+    const getUserResponse = await firstValueFrom(
+      this.userServiceClient.send<UserSearchResponse>(USER_SEARCH_BY_ID, data),
     );
 
     if (!isOk(getUserResponse.status))
@@ -87,11 +91,11 @@ export class AuthController {
         message: 'logout_user_error',
         status: getUserResponse.status,
         errors: getUserResponse.errors,
-        data: false,
+        data: { destroyed: false },
       };
 
-    const destroyTokenResponse: TokenDestroyResponse = await firstValueFrom(
-      this.tokenServiceClient.send(TOKEN_DESTROY, {
+    const destroyTokenResponse = await firstValueFrom(
+      this.tokenServiceClient.send<TokenDestroyResponse>(TOKEN_DESTROY, {
         id: getUserResponse.data.user.id,
       }),
     );
