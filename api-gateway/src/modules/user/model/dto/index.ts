@@ -1,8 +1,10 @@
+import { UserIdDto } from './UserIdDto';
 import { ForgotPasswordDto } from './ForgotPasswordDto';
 import { CreateUserDto } from './CreateUserDto';
 import { AddRoleDto } from './AddRoleDto';
 import { ChangePasswordDto } from './ChangePasswordDto';
 import { ConfirmUserDto } from './ConfirmUserDto';
+import { UserCredentialsDto } from './UserCredentialsDtro';
 
 export {
   AddRoleDto,
@@ -10,4 +12,6 @@ export {
   ConfirmUserDto,
   CreateUserDto,
   ForgotPasswordDto,
+  UserCredentialsDto,
+  UserIdDto,
 };

@@ -1,4 +1,3 @@
-import { Response } from 'src/lib/Response';
 import {
   Body,
   Controller,
@@ -26,9 +25,11 @@ import { ResponseInterceptor } from 'src/services/interceptor/response.intercept
 import { Authorization } from 'src/services/decorators/authorization.decorator';
 import { UserSearchResponse } from 'src/modules/user/model/responses';
 import {
-  TokenCreateResponse,
   TokenDestroyResponse,
+  TokenResponse,
 } from 'src/modules/token/model/responses';
+import { CreateTokenDto, DestroyTokenDto } from 'src/modules/token/model/dto';
+import { UserCredentialsDto, UserIdDto } from 'src/modules/user/model/dto';
 
 @UseInterceptors(ResponseInterceptor)
 @Controller('auth')
@@ -47,7 +48,7 @@ export class AuthController {
     @Body() loginRequest: LoginUserDto,
   ): Promise<LoginUserResponse> {
     const getUserResponse = await firstValueFrom(
-      this.userServiceClient.send<UserSearchResponse>(
+      this.userServiceClient.send<UserSearchResponse, UserCredentialsDto>(
         USER_SEARCH_BY_CREDENTIALS,
         loginRequest,
       ),
@@ -62,9 +63,12 @@ export class AuthController {
       };
 
     const createTokenResponse = await firstValueFrom(
-      this.tokenServiceClient.send<TokenCreateResponse>(TOKEN_CREATE, {
-        userId: getUserResponse.data.user.id,
-      }),
+      this.tokenServiceClient.send<TokenResponse, CreateTokenDto>(
+        TOKEN_CREATE,
+        {
+          userId: getUserResponse.data.user.id,
+        },
+      ),
     );
 
     return {
@@ -81,9 +85,12 @@ export class AuthController {
   @ApiCreatedResponse({
     type: LogoutResponseType,
   })
-  async logoutUser(@Body() data: { id: string }): TokenDestroyResponse {
+  async logoutUser(@Body() data: UserIdDto): TokenDestroyResponse {
     const getUserResponse = await firstValueFrom(
-      this.userServiceClient.send<UserSearchResponse>(USER_SEARCH_BY_ID, data),
+      this.userServiceClient.send<UserSearchResponse, UserIdDto>(
+        USER_SEARCH_BY_ID,
+        data,
+      ),
     );
 
     if (!isOk(getUserResponse.status))
@@ -95,9 +102,12 @@ export class AuthController {
       };
 
     const destroyTokenResponse = await firstValueFrom(
-      this.tokenServiceClient.send<TokenDestroyResponse>(TOKEN_DESTROY, {
-        id: getUserResponse.data.user.id,
-      }),
+      this.tokenServiceClient.send<TokenDestroyResponse, DestroyTokenDto>(
+        TOKEN_DESTROY,
+        {
+          userId: getUserResponse.data.user.id,
+        },
+      ),
     );
 
     return {

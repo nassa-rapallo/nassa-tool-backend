@@ -1,5 +1,6 @@
 import { IsString } from 'class-validator';
-export class DecodeTokenDto {
+
+export class DestroyTokenDto {
   @IsString()
-  token: string;
+  userId: string;
 }
