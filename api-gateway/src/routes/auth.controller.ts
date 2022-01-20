@@ -1,35 +1,18 @@
-import {
-  Body,
-  Controller,
-  HttpStatus,
-  Inject,
-  Post,
-  Req,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, HttpStatus, Inject, Post, Req, UseInterceptors } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { firstValueFrom } from 'rxjs';
 import { TOKEN_SERVICE, USER_SERVICE } from 'src/clients';
 import { TOKEN_CREATE, TOKEN_DESTROY } from 'src/clients/token/commands';
-import {
-  USER_SEARCH_BY_CREDENTIALS,
-  USER_SEARCH_BY_ID,
-} from 'src/clients/user/commands';
-import { isOk } from 'src/lib/responseCode';
-import { LoginUserDto } from 'src/modules/auth/model/dto/LoginUserDto';
-import { LoginUserResponse } from 'src/modules/auth/model/response/LoginUserResponse';
-import { LoginResponseType } from 'src/modules/auth/swagger/LoginResponseType';
-import { LogoutResponseType } from 'src/modules/auth/swagger/LogoutResponseType';
+import { USER_SEARCH_BY_CREDENTIALS, USER_SEARCH_BY_ID } from 'src/clients/user/commands';
 import { ResponseInterceptor } from 'src/services/interceptor/response.interceptor';
 import { Authorization } from 'src/services/decorators/authorization.decorator';
-import { UserSearchResponse } from 'src/modules/user/model/responses';
-import {
-  TokenDestroyResponse,
-  TokenResponse,
-} from 'src/modules/token/model/responses';
-import { CreateTokenDto, DestroyTokenDto } from 'src/modules/token/model/dto';
-import { UserCredentialsDto, UserIdDto } from 'src/modules/user/model/dto';
+import { LoginUserResponse } from 'src/modules/auth/response';
+import { LoginUserDto } from 'src/modules/auth/dto';
+import { UserSearchResponse } from 'src/modules/user/response';
+import { UserCredentialsDto, UserIdDto } from 'src/modules/user/dto';
+import { TokenDestroyResponse, TokenResponse } from 'src/modules/token/responses';
+import { CreateTokenDto, DestroyTokenDto } from 'src/modules/token/dto';
 
 @UseInterceptors(ResponseInterceptor)
 @Controller('auth')
@@ -41,12 +24,13 @@ export class AuthController {
   ) {}
 
   @Post('/login')
-  @ApiCreatedResponse({
-    type: LoginResponseType,
+  @ApiOperation({ description: 'User login operation' })
+  @ApiBody({ type: [LoginUserDto] })
+  @ApiOkResponse({
+    type: LoginUserResponse,
+    description: 'Login successful',
   })
-  async loginUser(
-    @Body() loginRequest: LoginUserDto,
-  ): Promise<LoginUserResponse> {
+  async loginUser(@Body() loginRequest: LoginUserDto): Promise<LoginUserResponse> {
     const getUserResponse = await firstValueFrom(
       this.userServiceClient.send<UserSearchResponse, UserCredentialsDto>(
         USER_SEARCH_BY_CREDENTIALS,
@@ -54,68 +38,53 @@ export class AuthController {
       ),
     );
 
-    if (!isOk(getUserResponse.status))
+    if (getUserResponse.status >= 400)
       return {
         status: getUserResponse.status,
         message: 'login_user_error',
         data: null,
-        errors: getUserResponse.errors,
       };
 
     const createTokenResponse = await firstValueFrom(
-      this.tokenServiceClient.send<TokenResponse, CreateTokenDto>(
-        TOKEN_CREATE,
-        {
-          userId: getUserResponse.data.user.id,
-        },
-      ),
+      this.tokenServiceClient.send<TokenResponse, CreateTokenDto>(TOKEN_CREATE, {
+        userId: getUserResponse.data.user.id,
+      }),
     );
 
     return {
       status: createTokenResponse.status,
-      message: isOk(createTokenResponse.status)
-        ? 'login_success'
-        : 'login_failure',
+      message: createTokenResponse.status < 400 ? 'login_success' : 'login_failure',
       data: createTokenResponse.data,
-      errors: createTokenResponse.errors,
     };
   }
 
   @Post('/logout')
-  @ApiCreatedResponse({
-    type: LogoutResponseType,
+  @ApiOperation({ description: 'User logout' })
+  @ApiBody({ type: [UserIdDto] })
+  @ApiOkResponse({
+    type: TokenDestroyResponse,
   })
-  async logoutUser(@Body() data: UserIdDto): TokenDestroyResponse {
+  async logoutUser(@Body() data: UserIdDto): Promise<TokenDestroyResponse> {
     const getUserResponse = await firstValueFrom(
-      this.userServiceClient.send<UserSearchResponse, UserIdDto>(
-        USER_SEARCH_BY_ID,
-        data,
-      ),
+      this.userServiceClient.send<UserSearchResponse, UserIdDto>(USER_SEARCH_BY_ID, data),
     );
 
-    if (!isOk(getUserResponse.status))
+    if (getUserResponse.status >= 400)
       return {
         message: 'logout_user_error',
         status: getUserResponse.status,
-        errors: getUserResponse.errors,
         data: { destroyed: false },
       };
 
     const destroyTokenResponse = await firstValueFrom(
-      this.tokenServiceClient.send<TokenDestroyResponse, DestroyTokenDto>(
-        TOKEN_DESTROY,
-        {
-          userId: getUserResponse.data.user.id,
-        },
-      ),
+      this.tokenServiceClient.send<TokenDestroyResponse, DestroyTokenDto>(TOKEN_DESTROY, {
+        userId: getUserResponse.data.user.id,
+      }),
     );
 
     return {
       status: destroyTokenResponse.status,
-      message: isOk(destroyTokenResponse.status)
-        ? 'logout_user_success'
-        : 'logout_user_failure',
-      errors: destroyTokenResponse.errors,
+      message: destroyTokenResponse.status < 400 ? 'logout_user_success' : 'logout_user_failure',
       data: destroyTokenResponse.data,
     };
   }

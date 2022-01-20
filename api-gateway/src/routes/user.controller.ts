@@ -1,43 +1,16 @@
 import { MAILER_SERVICE, TOKEN_SERVICE, USER_SERVICE } from 'src/clients';
-import {
-  Body,
-  Controller,
-  Get,
-  Inject,
-  Post,
-  Put,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post, Put, UseInterceptors } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
 import { firstValueFrom } from 'rxjs';
 import { ResponseInterceptor } from 'src/services/interceptor/response.interceptor';
-import {
-  USER_ADD_ROLE,
-  USER_CONFIRM_LINK,
-  USER_CREATE,
-  USER_GET_ALL,
-  USER_FORGOT_PASSWORD,
-  USER_CHANGE_PASSWORD,
-} from '../clients/user/commands';
+import * as COMMANDS from '../clients/user/commands';
 import { MAILER_SEND } from 'src/clients/mailer/commands';
-import { MailResponse } from 'src/modules/mailer/model/response/MailResponse';
-import {
-  UserLinkResponse,
-  UserResponse,
-  ConfirmUserResponse,
-  ForgotPasswordResponse,
-  ChangePasswordResponse,
-  UserSearchAllResponse,
-} from 'src/modules/user/model/responses';
-import {
-  AddRoleDto,
-  ChangePasswordDto,
-  ConfirmUserDto,
-  CreateUserDto,
-  ForgotPasswordDto,
-} from 'src/modules/user/model/dto';
-import { SendMailDto } from 'src/modules/mailer/model/dto/SendMailDto';
+//prettier-ignore
+import * as Responses from 'src/modules/user/response';
+import * as Dto from 'src/modules/user/dto';
+import { MailResponse } from 'src/modules/mailer/response/MailResponse';
+import { SendMailDto } from 'src/modules/mailer/dto/SendMailDto';
 
 @UseInterceptors(ResponseInterceptor)
 @Controller('users')
@@ -49,21 +22,23 @@ export class UserController {
     @Inject(MAILER_SERVICE) private readonly mailerServiceClient: ClientProxy,
   ) {}
 
-  @ApiOkResponse({
-    description: 'Get All Users',
-  })
-  @Get()
-  async getUsers(): UserSearchAllResponse {
+  @Get('/')
+  @ApiOperation({ description: 'Get all current users' })
+  @ApiOkResponse({ type: Responses.UserSearchAllResponse })
+  async getUsers(): Promise<Responses.UserSearchAllResponse> {
     return firstValueFrom(
-      this.userServiceClient.send<UserSearchAllResponse>(USER_GET_ALL, {}),
+      this.userServiceClient.send<Responses.UserSearchAllResponse>(COMMANDS.USER_GET_ALL, {}),
     );
   }
 
-  @Post()
-  async createUser(@Body() createUser: CreateUserDto): UserLinkResponse {
+  @Post('/')
+  @ApiOperation({ description: 'Create a new user' })
+  @ApiBody({ type: [Dto.CreateUserDto] })
+  @ApiOkResponse({ type: Responses.UserLinkResponse })
+  async createUser(@Body() createUser: Dto.CreateUserDto): Promise<Responses.UserLinkResponse> {
     const userCreateResponse = await firstValueFrom(
-      this.userServiceClient.send<UserLinkResponse, CreateUserDto>(
-        USER_CREATE,
+      this.userServiceClient.send<Responses.UserLinkResponse, Dto.CreateUserDto>(
+        COMMANDS.USER_CREATE,
         createUser,
       ),
     );
@@ -83,32 +58,41 @@ export class UserController {
   }
 
   @Post('/role')
-  async addRoleToUser(@Body() data: AddRoleDto) {
+  @ApiOperation({ description: 'Add a role to an existing user' })
+  @ApiBody({ type: [Dto.AddRoleDto] })
+  @ApiOkResponse({ type: Responses.UserResponse })
+  async addRoleToUser(@Body() data: Dto.AddRoleDto): Promise<Responses.UserResponse> {
     return firstValueFrom(
-      this.userServiceClient.send<UserResponse, AddRoleDto>(
-        USER_ADD_ROLE,
+      this.userServiceClient.send<Responses.UserResponse, Dto.AddRoleDto>(
+        COMMANDS.USER_ADD_ROLE,
         data,
       ),
     );
   }
 
   @Post('/confirm')
-  async confirmUser(@Body() data: ConfirmUserDto): ConfirmUserResponse {
+  @ApiOperation({ description: 'Confirm user email' })
+  @ApiBody({ type: [Dto.ConfirmUserDto] })
+  @ApiOkResponse({ type: Responses.UserConfirmUserResponse })
+  async confirmUser(@Body() data: Dto.ConfirmUserDto): Promise<Responses.UserConfirmUserResponse> {
     return firstValueFrom(
-      this.userServiceClient.send<ConfirmUserResponse, ConfirmUserDto>(
-        USER_CONFIRM_LINK,
+      this.userServiceClient.send<Responses.UserConfirmUserResponse, Dto.ConfirmUserDto>(
+        COMMANDS.USER_CONFIRM_LINK,
         data,
       ),
     );
   }
 
   @Post('/forgot-password')
+  @ApiOperation({ description: 'Request the ability to set a new password' })
+  @ApiBody({ type: [Dto.ForgotPasswordDto] })
+  @ApiOkResponse({ type: Responses.UserForgotPasswordResponse })
   async forgotPassword(
-    @Body() data: ForgotPasswordDto,
-  ): ForgotPasswordResponse {
+    @Body() data: Dto.ForgotPasswordDto,
+  ): Promise<Responses.UserForgotPasswordResponse> {
     const forgotPasswordResponse = await firstValueFrom(
-      this.userServiceClient.send<ForgotPasswordResponse, ForgotPasswordDto>(
-        USER_FORGOT_PASSWORD,
+      this.userServiceClient.send<Responses.UserForgotPasswordResponse, Dto.ForgotPasswordDto>(
+        COMMANDS.USER_FORGOT_PASSWORD,
         data,
       ),
     );
@@ -128,12 +112,15 @@ export class UserController {
   }
 
   @Put('/change-password')
+  @ApiOperation({ description: 'Set a new password' })
+  @ApiBody({ type: [Dto.ChangePasswordDto] })
+  @ApiOkResponse({ type: Responses.UserChangePasswordResponse })
   async changePassword(
-    @Body() data: ChangePasswordDto,
-  ): ChangePasswordResponse {
+    @Body() data: Dto.ChangePasswordDto,
+  ): Promise<Responses.UserChangePasswordResponse> {
     return firstValueFrom(
-      this.userServiceClient.send<ChangePasswordResponse, ChangePasswordDto>(
-        USER_CHANGE_PASSWORD,
+      this.userServiceClient.send<Responses.UserChangePasswordResponse, Dto.ChangePasswordDto>(
+        COMMANDS.USER_CHANGE_PASSWORD,
         data,
       ),
     );

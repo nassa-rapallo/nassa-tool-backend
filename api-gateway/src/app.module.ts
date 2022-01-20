@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { ConfigService } from './services/config/config.service';
 import { UserController } from './routes/user.controller';
 import { AuthController } from './routes/auth.controller';
@@ -15,13 +14,7 @@ import { MailerProvider } from './providers/mailer.provider';
 
 @Module({
   imports: [],
-  controllers: [
-    HelloController,
-    AppController,
-    UserController,
-    AuthController,
-    RoleController,
-  ],
+  controllers: [HelloController, UserController, AuthController, RoleController],
   providers: [
     ConfigService,
     UserProvider,

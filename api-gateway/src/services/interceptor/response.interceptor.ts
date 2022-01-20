@@ -7,22 +7,19 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Response } from 'src/lib/Response';
+import { DefaultResponse } from 'src/shared/types/Response/DefaultResponse';
 
-const EMPTY_ERRORS = [''];
-
-const handleResponse = (res: Response<unknown> | string) => {
+const handleResponse = (res: DefaultResponse | string) => {
   if (typeof res === 'string') return res;
 
-  if (res.status < 400 || res.statusCode < 400) return res;
+  if (res.status < 400) return res;
 
   throw new HttpException(
     {
       message: res.message,
       data: null,
-      errors: res.errors ? res.errors : EMPTY_ERRORS,
     },
-    res.status ? res.status : res.statusCode,
+    res.status,
   );
 };
 
