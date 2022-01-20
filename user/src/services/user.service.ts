@@ -30,6 +30,14 @@ export class UserService {
     return this.userRepository.find();
   }
 
+  async updateUser(data: UpdateUserDto): Promise<void> {
+    await this.userRepository.update({ id: data.id }, { ...data.userData });
+  }
+
+  async deleteUser(data: GetByIdDto): Promise<void> {
+    await this.userRepository.delete({ id: data.id });
+  }
+
   async searchByEmail(data: GetByEmailDto): Promise<User | undefined> {
     return this.userRepository.findOne({
       where: { email: data.email },
@@ -63,9 +71,5 @@ export class UserService {
       { id: data.id },
       { changing_password: data.operation },
     );
-  }
-
-  async updateUser(data: UpdateUserDto): Promise<void> {
-    await this.userRepository.update({ id: data.id }, { ...data.userData });
   }
 }

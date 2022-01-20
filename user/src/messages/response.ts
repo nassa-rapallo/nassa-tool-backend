@@ -2,7 +2,9 @@
 const USER_DEFAULT = {
   CREATE: 'user_create_user_',
   SEARCH_BY_CREDENTIALS: 'user_search_by_credentials_',
-  SEARCH_BY_ID: 'user_search_by_id_',
+  GET: 'user_get_',
+  DELETE: 'user_delete_',
+  UPDATE: 'user_update_',
   ADD_ROLE_TO_USER: 'user_add_role_to_user_',
   IS_ADMIN: 'user_is_admin_',
   FORGOT_PASSOWRD: 'user_forgot_password_',
@@ -20,10 +22,20 @@ export const SEARCH_BY_CREDENTIALS = {
   SUCCESS: USER_DEFAULT.SEARCH_BY_CREDENTIALS + 'success',
 };
 
-export const SEARCH_BY_ID = {
-  BAD_REQUEST: USER_DEFAULT.SEARCH_BY_ID + 'bad_request',
-  NOT_FOUND: USER_DEFAULT.SEARCH_BY_ID + 'not_found',
-  SUCCESS: USER_DEFAULT.SEARCH_BY_ID + 'success',
+export const GET_USER = {
+  BAD_REQUEST: USER_DEFAULT.GET + 'bad_request',
+  NOT_FOUND: USER_DEFAULT.GET + 'not_found',
+  SUCCESS: USER_DEFAULT.GET + 'success',
+};
+
+export const DELETE_USER = {
+  SUCCESS: USER_DEFAULT.DELETE + 'success',
+  ERROR: USER_DEFAULT.DELETE + 'error',
+};
+
+export const UPDATE_USER = {
+  SUCCESS: USER_DEFAULT.UPDATE + 'success',
+  ERROR: USER_DEFAULT.UPDATE + 'error',
 };
 
 export const ADD_ROLE_TO_USER = {

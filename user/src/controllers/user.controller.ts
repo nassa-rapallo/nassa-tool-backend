@@ -1,7 +1,9 @@
 import {
+  UserDeletedResponse,
   UserLinkResponse,
   UserResponse,
   UserSearchAllResponse,
+  UserUpdatedResponse,
 } from './../responses/UserResponses';
 import { Controller, HttpStatus } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
@@ -13,13 +15,17 @@ import {
   USER_CREATE,
   USER_GET_ALL,
   USER_SEARCH_BY_CREDENTIALS,
-  USER_SEARCH_BY_ID,
+  USER_GET,
+  USER_DELETE,
+  USER_UPDATE,
 } from '../messages/command';
 import {
   ADD_ROLE_TO_USER,
   CREATE_USER,
   SEARCH_BY_CREDENTIALS,
-  SEARCH_BY_ID,
+  GET_USER,
+  DELETE_USER,
+  UPDATE_USER,
 } from '../messages/response';
 import { UserSearchResponse } from '../responses/UserResponses';
 import { RoleService } from 'src/services/role.service';
@@ -28,6 +34,7 @@ import { LinkService } from 'src/services/link.service';
 import { TYPES } from 'src/entities/link.entity';
 import { AddRoleDto } from 'src/model/user/AddRoleDto';
 import { GetByIdDto } from 'src/model/GetByIdDto';
+import { UpdateUserDto } from 'src/model/user/UpdateUserDto';
 
 @Controller()
 export class UserController {
@@ -77,6 +84,48 @@ export class UserController {
     }
   }
 
+  @MessagePattern(USER_DELETE)
+  async deleteUser(@Payload() deleteUser: GetByIdDto): UserDeletedResponse {
+    try {
+      await this.userService.deleteUser(deleteUser);
+
+      return {
+        status: HttpStatus.OK,
+        message: DELETE_USER.SUCCESS,
+        data: { deleted: true },
+      };
+    } catch {
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        message: DELETE_USER.ERROR,
+        data: { deleted: false },
+      };
+    }
+  }
+
+  @MessagePattern(USER_UPDATE)
+  async updateUser(@Payload() updateUser: UpdateUserDto): UserUpdatedResponse {
+    try {
+      await this.userService.updateUser(updateUser);
+
+      const updatedUser = await this.userService.searchById({
+        id: updateUser.id,
+      });
+
+      return {
+        status: HttpStatus.OK,
+        message: UPDATE_USER.SUCCESS,
+        data: { updated: true, user: updatedUser },
+      };
+    } catch {
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        message: UPDATE_USER.ERROR,
+        data: { updated: false },
+      };
+    }
+  }
+
   @MessagePattern(USER_GET_ALL)
   async getAllUsers(): UserSearchAllResponse {
     try {
@@ -94,6 +143,34 @@ export class UserController {
         data: null,
       };
     }
+  }
+
+  @MessagePattern(USER_GET)
+  public async getUserById(@Payload() data: GetByIdDto): UserSearchResponse {
+    // WRONG DATA
+    if (!data.id)
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        message: GET_USER.BAD_REQUEST,
+        data: null,
+      };
+
+    const user = await this.userService.searchById({ id: data.id });
+
+    // WRONG ID
+    if (!user)
+      return {
+        status: HttpStatus.NOT_FOUND,
+        message: GET_USER.NOT_FOUND,
+        data: null,
+      };
+
+    // SUCCESS
+    return {
+      status: HttpStatus.FOUND,
+      message: GET_USER.SUCCESS,
+      data: { user },
+    };
   }
 
   @MessagePattern(USER_SEARCH_BY_CREDENTIALS)
@@ -147,34 +224,6 @@ export class UserController {
           roles: user.roles,
         },
       },
-    };
-  }
-
-  @MessagePattern(USER_SEARCH_BY_ID)
-  public async getUserById(@Payload() data: GetByIdDto): UserSearchResponse {
-    // WRONG DATA
-    if (!data.id)
-      return {
-        status: HttpStatus.BAD_REQUEST,
-        message: SEARCH_BY_ID.BAD_REQUEST,
-        data: null,
-      };
-
-    const user = await this.userService.searchById({ id: data.id });
-
-    // WRONG ID
-    if (!user)
-      return {
-        status: HttpStatus.NOT_FOUND,
-        message: SEARCH_BY_ID.NOT_FOUND,
-        data: null,
-      };
-
-    // SUCCESS
-    return {
-      status: HttpStatus.FOUND,
-      message: SEARCH_BY_ID.SUCCESS,
-      data: { user },
     };
   }
 
