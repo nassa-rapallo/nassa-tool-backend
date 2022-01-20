@@ -1,4 +1,6 @@
 import { RoleResponse } from './RoleResponse';
-import { RoleSearchAllResponse } from './RoleSearchAllResponse';
+import { RoleGetAll } from './RoleGetAll';
+import { RoleDeleted } from './RoleDeleted';
+import { RoleUpdated } from './RoleUpdated';
 
-export { RoleResponse, RoleSearchAllResponse };
+export { RoleResponse as Role, RoleGetAll, RoleDeleted, RoleUpdated };
