@@ -1,3 +1,4 @@
+import { UpdateUserDto } from './UpdateUserDto';
 import { IsAdminDto } from './IsAdminDto';
 import { UserIdDto } from './UserIdDto';
 import { ForgotPasswordDto } from './ForgotPasswordDto';
@@ -6,6 +7,7 @@ import { AddRoleDto } from './AddRoleDto';
 import { ChangePasswordDto } from './ChangePasswordDto';
 import { ConfirmUserDto } from './ConfirmUserDto';
 import { UserCredentialsDto } from './UserCredentialsDtro';
+import { DeleteUserDto } from './DeleteUserDto';
 
 export {
   AddRoleDto,
@@ -16,4 +18,6 @@ export {
   UserCredentialsDto,
   UserIdDto,
   IsAdminDto,
+  DeleteUserDto,
+  UpdateUserDto,
 };

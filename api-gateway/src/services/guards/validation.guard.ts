@@ -1,17 +1,17 @@
-import { PermissionIsPermittedDto } from './../../modules/permission/dto/PermissionIsPermittedDto';
 import { firstValueFrom } from 'rxjs';
 import { CanActivate, Inject, Injectable, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ClientProxy } from '@nestjs/microservices';
 import { PERMISSION_SERVICE, TOKEN_SERVICE, USER_SERVICE } from 'src/clients';
-import { USER_IS_ADMIN, USER_SEARCH_BY_ID } from 'src/clients/user/commands';
+import { USER_IS_ADMIN, USER_GET } from 'src/clients/user/commands';
 import { Permission } from 'src/shared/Permission';
 import { Role } from 'src/model/Role';
-import { UserIsAdminResponse, UserSearchResponse } from 'src/modules/user/response';
+import * as UserResponses from 'src/modules/user/response';
+import * as UserDtos from 'src/modules/user/dto';
 import { User } from 'src/model/User';
-import { IsAdminDto, UserIdDto } from 'src/modules/user/dto';
 import { PERMISSION_IS_PERMITTED } from 'src/clients/permission/commands';
 import { IsPermittedResponse } from 'src/modules/permission/response/IsPermittedResponse';
+import { PermissionIsPermittedDto } from 'src/modules/permission/dto/PermissionIsPermittedDto';
 
 @Injectable()
 export class ValidationGuard implements CanActivate {
@@ -25,7 +25,7 @@ export class ValidationGuard implements CanActivate {
 
   private async roleForSection(userId: string, permission: Permission): Promise<Role | undefined> {
     const userSearchResponse = await firstValueFrom(
-      this.userServiceClient.send<UserSearchResponse, UserIdDto>(USER_SEARCH_BY_ID, {
+      this.userServiceClient.send<UserResponses.UserGet, UserDtos.UserIdDto>(USER_GET, {
         id: userId,
       }),
     );
@@ -37,7 +37,7 @@ export class ValidationGuard implements CanActivate {
 
   private async isAdmin(user: User): Promise<boolean> {
     const isGlobalAdminResponse = await firstValueFrom(
-      this.userServiceClient.send<UserIsAdminResponse, IsAdminDto>(USER_IS_ADMIN, {
+      this.userServiceClient.send<UserResponses.UserIsAdmin, UserDtos.IsAdminDto>(USER_IS_ADMIN, {
         userId: user.id,
       }),
     );
@@ -47,7 +47,7 @@ export class ValidationGuard implements CanActivate {
 
   private async isSectionAdmin(userId: string, section: string): Promise<boolean> {
     const isSectionAdminResponse = await firstValueFrom(
-      this.userServiceClient.send<UserIsAdminResponse, IsAdminDto>(USER_IS_ADMIN, {
+      this.userServiceClient.send<UserResponses.UserIsAdmin, UserDtos.IsAdminDto>(USER_IS_ADMIN, {
         userId,
         section,
       }),

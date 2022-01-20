@@ -6,6 +6,8 @@ import { UserForgotPassword } from './UserForgotPassword';
 import { User } from './User';
 import { UserIsAdmin } from './UserIsAdmin';
 import { UserLink } from './UserLink';
+import { UserDelete } from './UserDelete';
+import { UserUpdate } from './UserUpdate';
 
 export {
   UserChangePassword,
@@ -16,4 +18,6 @@ export {
   User,
   UserGetAll,
   UserGet,
+  UserDelete,
+  UserUpdate,
 };

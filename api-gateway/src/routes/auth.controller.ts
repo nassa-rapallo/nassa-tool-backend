@@ -4,12 +4,12 @@ import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { firstValueFrom } from 'rxjs';
 import { TOKEN_SERVICE, USER_SERVICE } from 'src/clients';
 import { TOKEN_CREATE, TOKEN_DESTROY } from 'src/clients/token/commands';
-import { USER_SEARCH_BY_CREDENTIALS, USER_SEARCH_BY_ID } from 'src/clients/user/commands';
+import { USER_SEARCH_BY_CREDENTIALS, USER_GET } from 'src/clients/user/commands';
 import { ResponseInterceptor } from 'src/services/interceptor/response.interceptor';
 import { Authorization } from 'src/services/decorators/authorization.decorator';
 import { LoginUserResponse } from 'src/modules/auth/response';
 import { LoginUserDto } from 'src/modules/auth/dto';
-import { UserSearchResponse } from 'src/modules/user/response';
+import * as UserResponses from 'src/modules/user/response';
 import { UserCredentialsDto, UserIdDto } from 'src/modules/user/dto';
 import { TokenDestroyResponse, TokenResponse } from 'src/modules/token/responses';
 import { CreateTokenDto, DestroyTokenDto } from 'src/modules/token/dto';
@@ -32,7 +32,7 @@ export class AuthController {
   })
   async loginUser(@Body() loginRequest: LoginUserDto): Promise<LoginUserResponse> {
     const getUserResponse = await firstValueFrom(
-      this.userServiceClient.send<UserSearchResponse, UserCredentialsDto>(
+      this.userServiceClient.send<UserResponses.UserGet, UserCredentialsDto>(
         USER_SEARCH_BY_CREDENTIALS,
         loginRequest,
       ),
@@ -66,7 +66,7 @@ export class AuthController {
   })
   async logoutUser(@Body() data: UserIdDto): Promise<TokenDestroyResponse> {
     const getUserResponse = await firstValueFrom(
-      this.userServiceClient.send<UserSearchResponse, UserIdDto>(USER_SEARCH_BY_ID, data),
+      this.userServiceClient.send<UserResponses.UserGet, UserIdDto>(USER_GET, data),
     );
 
     if (getUserResponse.status >= 400)

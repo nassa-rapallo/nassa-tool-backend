@@ -1,15 +1,9 @@
-import {
-  Injectable,
-  Inject,
-  CanActivate,
-  ExecutionContext,
-  HttpException,
-} from '@nestjs/common';
+import { Injectable, Inject, CanActivate, ExecutionContext, HttpException } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { Reflector } from '@nestjs/core';
 import { ClientProxy } from '@nestjs/microservices';
 import { TOKEN_DECODE } from 'src/clients/token/commands';
-import { USER_SEARCH_BY_ID } from 'src/clients/user/commands';
+import { USER_GET } from 'src/clients/user/commands';
 import { TOKEN_SERVICE, USER_SERVICE } from 'src/clients';
 
 @Injectable()
@@ -21,10 +15,7 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
-    const secured = this.reflector.get<string[]>(
-      'secured',
-      context.getHandler(),
-    );
+    const secured = this.reflector.get<string[]>('secured', context.getHandler());
 
     if (!secured) return true;
 
@@ -47,7 +38,7 @@ export class AuthGuard implements CanActivate {
     }
 
     const userInfo = await firstValueFrom(
-      this.userServiceClient.send(USER_SEARCH_BY_ID, {
+      this.userServiceClient.send(USER_GET, {
         id: userTokenInfo.data.userId,
       }),
     );
