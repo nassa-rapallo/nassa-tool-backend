@@ -1,5 +1,16 @@
-import { GET_ROLE, CREATE_ROLE, UPDATE_ROLE } from './../messages/response';
-import { ROLE_CREATE, ROLE_GET, ROLE_UPDATE } from './../messages/command';
+import { DeleteRoleDto } from './../model/role/DeleteRoleDto';
+import {
+  GET_ROLE,
+  CREATE_ROLE,
+  UPDATE_ROLE,
+  DELETE_ROLE,
+} from './../messages/response';
+import {
+  ROLE_CREATE,
+  ROLE_DELETE,
+  ROLE_GET,
+  ROLE_UPDATE,
+} from './../messages/command';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { Controller, HttpStatus } from '@nestjs/common';
 import { ROLE_GET_ALL } from 'src/messages/command';
@@ -7,6 +18,8 @@ import { RoleService } from 'src/services/role.service';
 import {
   RoleSearchAllResponse,
   RoleResponse,
+  RoleDeletedResponse,
+  RoleUpdatedResponse,
 } from 'src/responses/RoleResponses';
 import { GET_ALL_ROLES } from 'src/messages/response';
 import { RoleDto } from 'src/model/role/RoleDto';
@@ -70,20 +83,42 @@ export class RoleController {
   }
 
   @MessagePattern(ROLE_UPDATE)
-  async updateRole(@Payload() data: UpdateRoleDto): RoleResponse {
-    const updated = await this.roleService.updateRole(data);
+  async updateRole(@Payload() data: UpdateRoleDto): RoleUpdatedResponse {
+    try {
+      await this.roleService.updateRole(data);
 
-    if (!updated)
+      const updatedRole = await this.roleService.getRoleById({ id: data.id });
+
+      return {
+        status: HttpStatus.OK,
+        message: UPDATE_ROLE.SUCCESS,
+        data: { updated: true, role: updatedRole },
+      };
+    } catch {
       return {
         status: HttpStatus.BAD_REQUEST,
         message: UPDATE_ROLE.BAD_REQUEST,
-        data: null,
+        data: { updated: false },
       };
+    }
+  }
 
-    return {
-      status: HttpStatus.OK,
-      message: UPDATE_ROLE.SUCCESS,
-      data: { role: updated },
-    };
+  @MessagePattern(ROLE_DELETE)
+  async deleteRole(@Payload() data: DeleteRoleDto): RoleDeletedResponse {
+    try {
+      await this.roleService.deleteRole(data);
+
+      return {
+        status: HttpStatus.OK,
+        message: DELETE_ROLE.SUCCESS,
+        data: { deleted: true },
+      };
+    } catch {
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        message: DELETE_ROLE.BAD_REQUEST,
+        data: { deleted: false },
+      };
+    }
   }
 }

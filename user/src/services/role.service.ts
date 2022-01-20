@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from 'src/entities/role.entity';
 import { User } from 'src/entities/user.entity';
 import { GetByIdDto } from 'src/model/GetByIdDto';
+import { DeleteRoleDto } from 'src/model/role/DeleteRoleDto';
 import { GetBySectionDto } from 'src/model/role/GetBySectionDto';
 import { RoleDto } from 'src/model/role/RoleDto';
 import { UpdateRoleDto } from 'src/model/role/UpdateRoleDto';
@@ -42,25 +43,12 @@ export class RoleService {
     return this.roleRepository.save({ name: name, section: section });
   }
 
-  async updateRole(data: UpdateRoleDto): Promise<Role | undefined> {
-    const roleToUpdate = await this.getRole(data.oldRole);
+  async updateRole(data: UpdateRoleDto): Promise<void> {
+    await this.roleRepository.update({ id: data.id }, { ...data.roleData });
+  }
 
-    if (!roleToUpdate) return undefined;
-
-    try {
-      await this.roleRepository.update(
-        { section: data.oldRole.section, name: data.oldRole.name },
-        { name: data.name },
-      );
-
-      // updated role info
-      return {
-        ...roleToUpdate,
-        name: data.name,
-      };
-    } catch {
-      return undefined;
-    }
+  async deleteRole(data: DeleteRoleDto): Promise<void> {
+    await this.roleRepository.delete({ id: data.id });
   }
 
   async getUsersByRole({

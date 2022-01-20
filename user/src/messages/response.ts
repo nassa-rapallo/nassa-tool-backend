@@ -61,7 +61,8 @@ const ROLE_DEFAULT = {
   GET_ALL_ROLES: 'user_get_all_roles_',
   GET_ROLE: 'user_get_role_',
   CREATE_ROLE: 'user_create_role_',
-  UPDATE_ROLE: 'user_update_role',
+  UPDATE_ROLE: 'user_update_role_',
+  DELETE_ROLE: 'user_delete_role_',
 };
 
 export const GET_ALL_ROLES = {
@@ -82,6 +83,11 @@ export const CREATE_ROLE = {
 export const UPDATE_ROLE = {
   BAD_REQUEST: ROLE_DEFAULT.UPDATE_ROLE + 'bad_request',
   SUCCESS: ROLE_DEFAULT.UPDATE_ROLE + 'success',
+};
+
+export const DELETE_ROLE = {
+  SUCCESS: ROLE_DEFAULT.DELETE_ROLE + 'success',
+  BAD_REQUEST: ROLE_DEFAULT.DELETE_ROLE + 'bad_request',
 };
 
 // LINK RESPONSE MESSAGES
