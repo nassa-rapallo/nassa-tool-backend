@@ -6,6 +6,7 @@ import * as COMMANDS from './commands';
 import * as Responses from 'src/modules/user/response';
 import * as Dto from 'src/modules/user/dto';
 import * as Params from 'src/modules/user/param';
+import { LoginUserDto } from 'src/modules/auth/dto';
 
 @Injectable()
 export class UserService {
@@ -46,6 +47,15 @@ export class UserService {
   /* -------------------------------------------------------------------------- */
   /*                               FUNCTIONALITIES                              */
   /* -------------------------------------------------------------------------- */
+
+  async userGetByCredentials(data: LoginUserDto): Promise<Responses.UserGet> {
+    return firstValueFrom(
+      this.userClient.send<Responses.UserGet, LoginUserDto>(
+        COMMANDS.USER_SEARCH_BY_CREDENTIALS,
+        data,
+      ),
+    );
+  }
 
   async userAddRole(data: Dto.AddRoleDto): Promise<Responses.User> {
     return firstValueFrom(

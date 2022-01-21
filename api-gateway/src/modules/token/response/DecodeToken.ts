@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { UUID } from 'src/shared/constants/model';
 import { DefaultResponse } from 'src/shared/types/Response/DefaultResponse';
 
-export class DecodeTokenResponse extends DefaultResponse {
+export class DecodeToken extends DefaultResponse {
   @ApiProperty({
     example: UUID,
     description: 'UserID associated with the given token',

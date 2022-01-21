@@ -1,4 +1,4 @@
-import { LoginUserResponse } from './LoginUserResponse';
-import { LogoutUserResponse } from './LogoutUserResponse';
+import { LoginUser } from './LoginUser';
+import { LogoutUser } from './LogoutUser';
 
-export { LoginUserResponse, LogoutUserResponse };
+export { LoginUser, LogoutUser };

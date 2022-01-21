@@ -1,42 +1,34 @@
 import { Body, Controller, HttpStatus, Inject, Post, Req, UseInterceptors } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { firstValueFrom } from 'rxjs';
-import { TOKEN_SERVICE, USER_SERVICE } from 'src/clients';
-import { TOKEN_CREATE, TOKEN_DESTROY } from 'src/clients/token/commands';
-import { USER_SEARCH_BY_CREDENTIALS, USER_GET } from 'src/clients/user/commands';
+
 import { ResponseInterceptor } from 'src/services/interceptor/response.interceptor';
 import { Authorization } from 'src/services/decorators/authorization.decorator';
-import { LoginUserResponse } from 'src/modules/auth/response';
-import { LoginUserDto } from 'src/modules/auth/dto';
-import * as UserResponses from 'src/modules/user/response';
-import { UserCredentialsDto, UserIdDto } from 'src/modules/user/dto';
-import { TokenDestroyResponse, TokenResponse } from 'src/modules/token/responses';
-import { CreateTokenDto, DestroyTokenDto } from 'src/modules/token/dto';
+import { UserService } from 'src/services/clients/user/user.service';
+import { TokenService } from 'src/services/clients/token/token.service';
+
+import * as UserDto from 'src/modules/user/dto';
+import * as TokenResponses from 'src/modules/token/response';
+import * as Responses from 'src/modules/auth/response';
+import * as Dto from 'src/modules/auth/dto';
 
 @UseInterceptors(ResponseInterceptor)
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
   constructor(
-    @Inject(USER_SERVICE) private readonly userServiceClient: ClientProxy,
-    @Inject(TOKEN_SERVICE) private readonly tokenServiceClient: ClientProxy,
+    @Inject() private readonly userService: UserService,
+    @Inject() private readonly tokenService: TokenService,
   ) {}
 
   @Post('/login')
   @ApiOperation({ description: 'User login operation' })
-  @ApiBody({ type: [LoginUserDto] })
+  @ApiBody({ type: Dto.LoginUserDto })
   @ApiOkResponse({
-    type: LoginUserResponse,
+    type: Responses.LoginUser,
     description: 'Login successful',
   })
-  async loginUser(@Body() loginRequest: LoginUserDto): Promise<LoginUserResponse> {
-    const getUserResponse = await firstValueFrom(
-      this.userServiceClient.send<UserResponses.UserGet, UserCredentialsDto>(
-        USER_SEARCH_BY_CREDENTIALS,
-        loginRequest,
-      ),
-    );
+  async loginUser(@Body() loginRequest: Dto.LoginUserDto): Promise<Responses.LoginUser> {
+    const getUserResponse = await this.userService.userGetByCredentials(loginRequest);
 
     if (getUserResponse.status >= 400)
       return {
@@ -45,11 +37,9 @@ export class AuthController {
         data: null,
       };
 
-    const createTokenResponse = await firstValueFrom(
-      this.tokenServiceClient.send<TokenResponse, CreateTokenDto>(TOKEN_CREATE, {
-        userId: getUserResponse.data.user.id,
-      }),
-    );
+    const createTokenResponse = await this.tokenService.tokenCreate({
+      userId: getUserResponse.data.user.id,
+    });
 
     return {
       status: createTokenResponse.status,
@@ -60,14 +50,12 @@ export class AuthController {
 
   @Post('/logout')
   @ApiOperation({ description: 'User logout' })
-  @ApiBody({ type: [UserIdDto] })
+  @ApiBody({ type: UserDto.UserIdDto })
   @ApiOkResponse({
-    type: TokenDestroyResponse,
+    type: TokenResponses.TokenDestroy,
   })
-  async logoutUser(@Body() data: UserIdDto): Promise<TokenDestroyResponse> {
-    const getUserResponse = await firstValueFrom(
-      this.userServiceClient.send<UserResponses.UserGet, UserIdDto>(USER_GET, data),
-    );
+  async logoutUser(@Body() data: UserDto.UserIdDto): Promise<TokenResponses.TokenDestroy> {
+    const getUserResponse = await this.userService.userGet(data);
 
     if (getUserResponse.status >= 400)
       return {
@@ -76,11 +64,9 @@ export class AuthController {
         data: { destroyed: false },
       };
 
-    const destroyTokenResponse = await firstValueFrom(
-      this.tokenServiceClient.send<TokenDestroyResponse, DestroyTokenDto>(TOKEN_DESTROY, {
-        userId: getUserResponse.data.user.id,
-      }),
-    );
+    const destroyTokenResponse = await this.tokenService.tokenDestroy({
+      userId: getUserResponse.data.user.id,
+    });
 
     return {
       status: destroyTokenResponse.status,
