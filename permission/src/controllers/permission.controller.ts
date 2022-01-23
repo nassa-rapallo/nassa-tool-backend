@@ -1,4 +1,4 @@
-import { PERMISSION_IS_PERMITTED } from './../messages/command';
+import { PERMISSION_IS_PERMITTED } from '../model/permission/messages/command';
 import { SectionService } from 'src/services/section.service';
 import { Controller, HttpStatus } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
@@ -7,8 +7,11 @@ import { PermissionService } from '../services/permission.service';
 import {
   PERMISSION_CREATE,
   PERMISSION_GET_ROLES_FOR_RULE,
-} from 'src/messages/command';
-import { CREATE_PERMISSION, GET_ROLES } from 'src/messages/response';
+} from 'src/model/permission/messages/command';
+import {
+  CREATE_PERMISSION,
+  GET_ROLES,
+} from 'src/model/permission/messages/response';
 import {
   CreatePermissionResponse,
   GetRolesForRuleResponse,
@@ -32,6 +35,10 @@ export class PermissionController {
   getHello(): string {
     return 'Hello from Permission';
   }
+
+  /* -------------------------------------------------------------------------- */
+  /*                                    CRUD                                    */
+  /* -------------------------------------------------------------------------- */
 
   @MessagePattern(PERMISSION_CREATE)
   async createPermission(data: CreatePermissionDto): CreatePermissionResponse {
@@ -87,6 +94,9 @@ export class PermissionController {
     }
   }
 
+  /* -------------------------------------------------------------------------- */
+  /*                               FUNCTIONALITIES                              */
+  /* -------------------------------------------------------------------------- */
   @MessagePattern(PERMISSION_GET_ROLES_FOR_RULE)
   async getRolesForRule(@Payload() data: GetRolesDto): GetRolesForRuleResponse {
     try {

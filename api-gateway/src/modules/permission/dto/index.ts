@@ -1,3 +1,4 @@
 import { CreatePermissionDto } from './CreatePermissionDto';
+import { PermissionIsPermittedDto } from './PermissionIsPermittedDto';
 
-export { CreatePermissionDto };
+export { CreatePermissionDto, PermissionIsPermittedDto };

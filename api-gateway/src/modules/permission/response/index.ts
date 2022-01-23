@@ -1,4 +1,5 @@
-import { GetRolesForRuleResponse } from './GetRolesForRuleResponse';
-import { CreatePermissionResponse } from './CreatePermissionResponse';
+import { PermissionIsPermitted } from './PermissionIsPermitted';
+import { PermissionGetRoles } from './PermissionGetRole';
+import { PermissionCreated } from './PermissionCreated';
 
-export { CreatePermissionResponse, GetRolesForRuleResponse };
+export { PermissionCreated, PermissionGetRoles, PermissionIsPermitted };
