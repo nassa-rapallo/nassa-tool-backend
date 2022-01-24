@@ -1,5 +1,5 @@
 export class CreateRuleDto {
-  sectionId: string;
+  section: string;
   action: string;
   roles: string[];
 }

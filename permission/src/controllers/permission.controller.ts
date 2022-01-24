@@ -1,9 +1,7 @@
 import { PERMISSION_IS_PERMITTED } from '../model/permission/messages/command';
-import { SectionService } from 'src/services/section.service';
 import { Controller, HttpStatus } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { RuleService } from 'src/services/rule.service';
-import { PermissionService } from '../services/permission.service';
 import {
   PERMISSION_CREATE,
   PERMISSION_GET_ROLES_FOR_RULE,
@@ -25,11 +23,7 @@ import {
 
 @Controller()
 export class PermissionController {
-  constructor(
-    private readonly permissionService: PermissionService,
-    private readonly ruleService: RuleService,
-    private readonly sectionService: SectionService,
-  ) {}
+  constructor(private readonly ruleService: RuleService) {}
 
   @MessagePattern('hello_permission')
   getHello(): string {
@@ -43,17 +37,6 @@ export class PermissionController {
   @MessagePattern(PERMISSION_CREATE)
   async createPermission(data: CreatePermissionDto): CreatePermissionResponse {
     try {
-      // search for the section in the db
-      let responseSection = await this.sectionService.getSectionByName({
-        name: data.section,
-      });
-
-      // if no section with that name, create a new one
-      if (!responseSection)
-        responseSection = await this.sectionService.createSection({
-          name: data.section,
-        });
-
       // search the action in the db
       let responseAction = await this.ruleService.getRuleByAction({
         action: data.action,
@@ -62,7 +45,7 @@ export class PermissionController {
       // if no action with the requested name, create a new one
       if (!responseAction)
         responseAction = await this.ruleService.createRule({
-          sectionId: responseSection.id,
+          section: data.section,
           action: data.action,
           roles: [data.role],
         });
@@ -83,7 +66,7 @@ export class PermissionController {
       return {
         status: HttpStatus.OK,
         message: CREATE_PERMISSION.OK,
-        data: { action: responseAction, section: responseSection },
+        data: { action: responseAction },
       };
     } catch {
       return {
@@ -100,20 +83,9 @@ export class PermissionController {
   @MessagePattern(PERMISSION_GET_ROLES_FOR_RULE)
   async getRolesForRule(@Payload() data: GetRolesDto): GetRolesForRuleResponse {
     try {
-      const section = await this.sectionService.getSectionByName({
-        name: data.section,
+      const rule = await this.ruleService.getRuleByAction({
+        action: data.action,
       });
-
-      const rule = section.rules.find((rule) => rule.action === data.action);
-
-      if (!rule) {
-        return {
-          status: HttpStatus.BAD_REQUEST,
-          message: GET_ROLES.BAD_REQUEST,
-          data: null,
-          errors: ['rule_not_found'],
-        };
-      }
 
       return {
         status: HttpStatus.OK,
@@ -125,36 +97,34 @@ export class PermissionController {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         message: GET_ROLES.ERROR,
         data: null,
-        errors: ['something_went_wrong'],
       };
     }
   }
 
   @MessagePattern(PERMISSION_IS_PERMITTED)
   async isPermitted(@Payload() data: IsPermittedDto): IsPermittedResponse {
-    const roles = await this.getRolesForRule({
-      section: data.section,
-      action: data.action,
-    });
+    try {
+      const { roles } = await this.ruleService.getRuleByAction({
+        action: data.action,
+      });
 
-    if (!roles.data) {
+      const isRolePermitted = roles.find((role) => role === data.role)
+        ? true
+        : false;
+
+      return {
+        status: HttpStatus.OK,
+        message: isRolePermitted
+          ? 'permisssion_is_permitted'
+          : 'permission_is_not_permitted',
+        data: { permitted: isRolePermitted },
+      };
+    } catch {
       return {
         status: HttpStatus.BAD_REQUEST,
-        message: 'permission_role_is_not_permitted',
+        message: 'permission_is_not_permitted',
         data: { permitted: false },
       };
     }
-
-    const isRolePermitted = roles.data.roles.find((role) => role === data.role)
-      ? true
-      : false;
-
-    return {
-      status: HttpStatus.OK,
-      message: isRolePermitted
-        ? 'permisssion_is_permitted'
-        : 'permission_is_not_permitted',
-      data: { permitted: isRolePermitted },
-    };
   }
 }

@@ -3,29 +3,16 @@ import { Injectable } from '@nestjs/common';
 import { Rule } from 'src/entities/rule.entity';
 import { Repository } from 'typeorm';
 import { CreateRuleDto } from 'src/model/rule/dto/CreateRuleDto';
-import { SectionService } from './section.service';
 import { UpdateRuleDto } from 'src/model/rule/dto/UpdateRuleDto';
 
 @Injectable()
 export class RuleService {
   constructor(
-    private readonly sectionService: SectionService,
     @InjectRepository(Rule) private readonly ruleRepository: Repository<Rule>,
   ) {}
 
   async createRule(createRuleDto: CreateRuleDto): Promise<Rule> {
-    const section = await this.sectionService.getSectionById({
-      id: createRuleDto.sectionId,
-    });
-
-    const rule = this.ruleRepository.create({
-      action: createRuleDto.action,
-      roles: createRuleDto.roles,
-    });
-
-    rule.section = section;
-
-    return this.ruleRepository.save(rule);
+    return this.ruleRepository.save(createRuleDto);
   }
 
   async getAll(): Promise<Rule[]> {
@@ -37,7 +24,9 @@ export class RuleService {
   }
 
   async getRuleByAction(data: { action: string }): Promise<Rule> {
-    return this.ruleRepository.findOne({ where: { action: data.action } });
+    return this.ruleRepository.findOneOrFail({
+      where: { action: data.action },
+    });
   }
 
   async deleteRule(data: { id: string }): Promise<void> {
