@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsUUID, IsArray } from 'class-validator';
 import { SECTION, UUID } from 'src/shared/constants/model';
-import { Rule } from './Rule';
+import { Role } from './Role';
 
 export class Section {
   @ApiProperty({ example: UUID, description: 'ID of the section' })
@@ -13,7 +13,7 @@ export class Section {
   @IsString()
   name: string;
 
-  @ApiProperty({ description: 'List of the rules' })
-  @IsArray({ message: 'rules must be an array' })
-  rules: Rule[];
+  @ApiProperty({ description: 'List of the roles' })
+  @IsArray({ message: 'Roles must be an array' })
+  roles: Role[];
 }

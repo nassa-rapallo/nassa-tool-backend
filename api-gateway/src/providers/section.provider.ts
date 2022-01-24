@@ -1,10 +1,10 @@
 import { Provider } from '@nestjs/common';
 import { ClientProxyFactory, Transport } from '@nestjs/microservices';
-import { USER_SERVICE } from 'src/services/clients/clientsName';
+import { SECTION_SERVICE } from 'src/services/clients/clientsName';
 import { ConfigService } from 'src/services/config/config.service';
 
-export const UserProvider: Provider = {
-  provide: USER_SERVICE,
+export const SectionProvider: Provider = {
+  provide: SECTION_SERVICE,
   useFactory: (configService: ConfigService) => {
     const rabbit = configService.get('rabbit');
 

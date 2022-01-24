@@ -1,4 +1,15 @@
-import { Controller, Get, Inject, Post, Body, Param, Delete, Put } from '@nestjs/common';
+import { ResponseInterceptor } from 'src/services/interceptor/response.interceptor';
+import {
+  Controller,
+  Get,
+  Inject,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Put,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { RoleService } from 'src/services/clients/role/role.service';
 
@@ -6,6 +17,7 @@ import * as Dto from 'src/modules/role/dto';
 import * as Params from 'src/modules/role/param';
 import * as Responses from 'src/modules/role/response';
 
+@UseInterceptors(ResponseInterceptor)
 @Controller('roles')
 export class RoleController {
   constructor(@Inject() private readonly roleService: RoleService) {}
