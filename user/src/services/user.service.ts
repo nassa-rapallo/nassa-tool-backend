@@ -4,7 +4,6 @@ import { User } from 'src/entities/user.entity';
 import { CreateUserDto } from 'src/model/user/CreateUserDto';
 import { Repository } from 'typeorm';
 import { hash, compare } from 'bcrypt';
-import { SECTIONS } from 'src/entities/role.entity';
 import { GetByIdDto } from 'src/model/GetByIdDto';
 import { GetByEmailDto } from 'src/model/GetByEmailDto';
 import { ChangingPasswordDto } from 'src/model/user/ChangingPasswordDto';
@@ -57,8 +56,8 @@ export class UserService {
     return compared;
   }
 
-  async isAdmin(user: User, section: string = SECTIONS.ALL): Promise<boolean> {
-    const userRole = user.roles.find((role) => role.section === section);
+  async isAdmin(user: User, section: string): Promise<boolean> {
+    const userRole = user.roles.find((role) => role.section.name === section);
     return userRole ? userRole.isAdmin : false;
   }
 

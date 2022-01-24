@@ -17,5 +17,12 @@ export const ROLE_DELETE = 'user_delete_role';
 export const ROLE_GET_ALL = 'user_get_all_roles';
 export const ROLE_GET = 'user_get_role';
 
+// SECTION
+export const SECTION_CREATE = 'user_create_section';
+export const SECTION_UPDATE = 'user_update_section';
+export const SECTION_DELETE = 'user_delete_section';
+export const SECTION_GET_ALL = 'user_get_all_sections';
+export const SECTION_GET = 'user_get_section';
+
 // LINK
 export const USER_CONFIRM_LINK = 'user_confirm_link';

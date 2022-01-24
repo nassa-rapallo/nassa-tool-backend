@@ -24,10 +24,14 @@ import {
 import { GET_ALL_ROLES } from 'src/messages/response';
 import { RoleDto } from 'src/model/role/RoleDto';
 import { UpdateRoleDto } from 'src/model/role/UpdateRoleDto';
+import { SectionService } from 'src/services/section.service';
 
 @Controller()
 export class RoleController {
-  constructor(private readonly roleService: RoleService) {}
+  constructor(
+    private readonly roleService: RoleService,
+    private readonly sectionService: SectionService,
+  ) {}
 
   @MessagePattern(ROLE_GET_ALL)
   async getAllRoles(): RoleSearchAllResponse {
@@ -48,38 +52,63 @@ export class RoleController {
 
   @MessagePattern(ROLE_GET)
   async getRole(@Payload() roleDto: RoleDto): RoleResponse {
-    const role = await this.roleService.getRole(roleDto);
+    try {
+      // find the section
+      const section = await this.sectionService.getSectionById({
+        id: roleDto.section,
+      });
 
-    if (!role)
+      // find the role
+      const role = await this.roleService.getRole({
+        name: roleDto.name,
+        section,
+      });
+
+      return {
+        status: HttpStatus.OK,
+        message: GET_ROLE.SUCCESS,
+        data: { role },
+      };
+    } catch {
       return {
         status: HttpStatus.BAD_REQUEST,
         message: GET_ROLE.BAD_REQUEST,
         data: null,
       };
-
-    return {
-      status: HttpStatus.OK,
-      message: GET_ROLE.SUCCESS,
-      data: { role },
-    };
+    }
   }
 
   @MessagePattern(ROLE_CREATE)
   async createRole(@Payload() roleDto: RoleDto): RoleResponse {
-    const createdRole = await this.roleService.createRole(roleDto);
+    try {
+      const section = await this.sectionService.getSectionByName({
+        name: roleDto.section,
+      });
 
-    if (!createdRole)
+      const createdRole = await this.roleService.createRole({
+        name: roleDto.name,
+        section,
+      });
+
+      if (!createdRole)
+        return {
+          status: HttpStatus.BAD_REQUEST,
+          message: CREATE_ROLE.BAD_REQUEST,
+          data: null,
+        };
+
+      return {
+        status: HttpStatus.OK,
+        message: CREATE_ROLE.SUCCESS,
+        data: { role: createdRole },
+      };
+    } catch {
       return {
         status: HttpStatus.BAD_REQUEST,
         message: CREATE_ROLE.BAD_REQUEST,
         data: null,
       };
-
-    return {
-      status: HttpStatus.OK,
-      message: CREATE_ROLE.SUCCESS,
-      data: { role: createdRole },
-    };
+    }
   }
 
   @MessagePattern(ROLE_UPDATE)

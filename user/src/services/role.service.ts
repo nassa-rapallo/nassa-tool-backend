@@ -5,7 +5,9 @@ import { User } from 'src/entities/user.entity';
 import { GetByIdDto } from 'src/model/GetByIdDto';
 import { DeleteRoleDto } from 'src/model/role/DeleteRoleDto';
 import { GetBySectionDto } from 'src/model/role/GetBySectionDto';
+import { RoleCreateDto } from 'src/model/role/RoleCreateDto';
 import { RoleDto } from 'src/model/role/RoleDto';
+import { RoleGetDto } from 'src/model/role/RoleGetDto';
 import { UpdateRoleDto } from 'src/model/role/UpdateRoleDto';
 import { Connection, Repository } from 'typeorm';
 
@@ -17,15 +19,21 @@ export class RoleService {
   ) {}
 
   async getRoles(): Promise<Role[]> {
-    return this.roleRepository.find();
+    return this.roleRepository.find({ relations: ['section'] });
   }
 
-  async getRole({ name, section }: RoleDto): Promise<Role | undefined> {
-    return this.roleRepository.findOne({ section, name });
+  async getRole({ name, section }: RoleGetDto): Promise<Role | undefined> {
+    return this.roleRepository.findOneOrFail(
+      { section, name },
+      { relations: ['section'] },
+    );
   }
 
   async getRoleById(data: GetByIdDto): Promise<Role | undefined> {
-    return this.roleRepository.findOne({ id: data.id });
+    return this.roleRepository.findOneOrFail(
+      { id: data.id },
+      { relations: ['section'] },
+    );
   }
 
   async getRolesBySection(data: GetBySectionDto): Promise<Role[] | undefined> {
@@ -34,12 +42,7 @@ export class RoleService {
     });
   }
 
-  async createRole({ name, section }: RoleDto): Promise<Role | undefined> {
-    const isAlreadyPresent = await this.roleRepository.findOne({
-      where: { name: name, section: section },
-    });
-
-    if (isAlreadyPresent) return undefined;
+  async createRole({ name, section }: RoleCreateDto): Promise<Role> {
     return this.roleRepository.save({ name: name, section: section });
   }
 

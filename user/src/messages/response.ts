@@ -1,4 +1,6 @@
-// ROLES RESPONSE MESSAGES
+/* -------------------------------------------------------------------------- */
+/*                           USER RESPONSE MESSAGES                           */
+/* -------------------------------------------------------------------------- */
 const USER_DEFAULT = {
   CREATE: 'user_create_user_',
   SEARCH_BY_CREDENTIALS: 'user_search_by_credentials_',
@@ -56,7 +58,9 @@ export const FORGOT_PASSWORD = {
   BAD_REQUEST: USER_DEFAULT.FORGOT_PASSOWRD + 'bad_request',
 };
 
-// ROLES RESPONSE MESSAGES
+/* -------------------------------------------------------------------------- */
+/*                           ROLES RESPONSE MESSAGES                          */
+/* -------------------------------------------------------------------------- */
 const ROLE_DEFAULT = {
   GET_ALL_ROLES: 'user_get_all_roles_',
   GET_ROLE: 'user_get_role_',
@@ -90,7 +94,46 @@ export const DELETE_ROLE = {
   BAD_REQUEST: ROLE_DEFAULT.DELETE_ROLE + 'bad_request',
 };
 
-// LINK RESPONSE MESSAGES
+/* -------------------------------------------------------------------------- */
+/*                          SECTION RESPONSE MESSAGES                         */
+/* -------------------------------------------------------------------------- */
+
+const SECTION_DEFAULT = {
+  GET_ALL_SECTIONS: 'user_get_all_roles_',
+  GET_SECTION: 'user_get_role_',
+  CREATE_SECTION: 'user_create_role_',
+  UPDATE_SECTION: 'user_update_role_',
+  DELETE_SECTION: 'user_delete_role_',
+};
+
+export const GET_ALL_SECTIONS = {
+  BAD_REQUEST: SECTION_DEFAULT.GET_ALL_SECTIONS + 'bad_request',
+  SUCCESS: SECTION_DEFAULT.GET_ALL_SECTIONS + 'success',
+};
+
+export const GET_SECTION = {
+  BAD_REQUEST: SECTION_DEFAULT.GET_SECTION + 'bad_request',
+  SUCCESS: SECTION_DEFAULT.GET_SECTION + 'success',
+};
+
+export const CREATE_SECTION = {
+  BAD_REQUEST: SECTION_DEFAULT.CREATE_SECTION + 'bad_request',
+  SUCCESS: SECTION_DEFAULT.CREATE_SECTION + 'success',
+};
+
+export const UPDATE_SECTION = {
+  BAD_REQUEST: SECTION_DEFAULT.UPDATE_SECTION + 'bad_request',
+  SUCCESS: SECTION_DEFAULT.UPDATE_SECTION + 'success',
+};
+
+export const DELETE_SECTION = {
+  SUCCESS: SECTION_DEFAULT.DELETE_SECTION + 'success',
+  BAD_REQUEST: SECTION_DEFAULT.DELETE_SECTION + 'bad_request',
+};
+
+/* -------------------------------------------------------------------------- */
+/*                           LINK RESPONSE MESSAGES                           */
+/* -------------------------------------------------------------------------- */
 const LINK_DEFAULT = {
   CONFIRM_LINK: 'user_confirm_link',
 };
