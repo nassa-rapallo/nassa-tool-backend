@@ -1,14 +1,17 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigService } from './services/config/config.service';
 
-import Providers from 'src/providers';
-import Controllers from 'src/routes';
-import Guards from 'src/services/guards';
-import Services from 'src/services/clients';
+import { UserModule } from './app/user.module';
+import { MailerModule } from './app/mailer.module';
+import { PermissionModule } from './app/permission.module';
+import { RoleModule } from './app/role.module';
+import { SectionModule } from './app/section.module';
+import { TokenModule } from './app/token.module';
+import { HelloModule } from './app/hello.module';
 
 @Module({
-  imports: [],
-  controllers: [...Controllers],
-  providers: [ConfigService, ...Services, ...Providers, ...Guards],
+  imports: [MailerModule, PermissionModule, RoleModule, SectionModule, TokenModule, HelloModule],
+  providers: [ConfigService],
+  exports: [ConfigService],
 })
 export class AppModule {}

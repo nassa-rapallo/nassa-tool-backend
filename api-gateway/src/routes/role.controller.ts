@@ -20,7 +20,7 @@ import * as Responses from 'src/modules/role/response';
 @UseInterceptors(ResponseInterceptor)
 @Controller('roles')
 export class RoleController {
-  constructor(@Inject() private readonly roleService: RoleService) {}
+  constructor(private readonly roleService: RoleService) {}
 
   @Get('/')
   @ApiOperation({ description: 'Get all current roles' })

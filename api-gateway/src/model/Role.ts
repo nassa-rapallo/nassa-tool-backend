@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsUUID } from 'class-validator';
 import { ROLE, SECTION, UUID } from 'src/shared/constants/model';
+import { Section } from './Section';
 
 export class Role {
   @ApiProperty({ example: UUID, description: 'Role ID' })
@@ -8,9 +9,9 @@ export class Role {
   @IsUUID(4, { message: 'id must be an UUID' })
   id: string;
 
-  @ApiProperty({ example: SECTION, description: 'The name of the section' })
+  @ApiProperty({ example: SECTION, description: 'The role section' })
   @IsString()
-  section: string;
+  section: Section;
 
   @ApiProperty({ example: ROLE, description: 'The name of the role' })
   @IsString()

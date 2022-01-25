@@ -89,4 +89,10 @@ export class UserService {
       ),
     );
   }
+
+  async userIsAdmin(data: Dto.IsAdminDto): Promise<Responses.UserIsAdmin> {
+    return firstValueFrom(
+      this.userClient.send<Responses.UserIsAdmin, Dto.IsAdminDto>(COMMANDS.USER_IS_ADMIN, data),
+    );
+  }
 }

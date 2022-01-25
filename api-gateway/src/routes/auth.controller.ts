@@ -16,8 +16,8 @@ import * as Dto from 'src/modules/auth/dto';
 @ApiTags('auth')
 export class AuthController {
   constructor(
-    @Inject() private readonly userService: UserService,
-    @Inject() private readonly tokenService: TokenService,
+    private readonly userService: UserService,
+    private readonly tokenService: TokenService,
   ) {}
 
   @Post('/login')

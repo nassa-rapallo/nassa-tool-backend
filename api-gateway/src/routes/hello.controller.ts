@@ -5,7 +5,8 @@ import {
   PERMISSION_SERVICE,
   TOKEN_SERVICE,
   USER_SERVICE,
-} from 'src/clients';
+} from 'src/services/clients/clientsName';
+
 import { firstValueFrom } from 'rxjs';
 @Controller('hello')
 export class HelloController {
@@ -34,8 +35,6 @@ export class HelloController {
 
   @Get('/permission')
   async permission(): Promise<string> {
-    return firstValueFrom(
-      this.permissionServiceClient.send('hello_permission', {}),
-    );
+    return firstValueFrom(this.permissionServiceClient.send('hello_permission', {}));
   }
 }

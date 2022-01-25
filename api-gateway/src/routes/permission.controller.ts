@@ -10,10 +10,7 @@ import * as Responses from 'src/modules/permission/response';
 @Controller('permission')
 @ApiTags('permission')
 export class PermissionController {
-  constructor(
-    @Inject()
-    private readonly permissionService: PermissionService,
-  ) {}
+  constructor(private readonly permissionService: PermissionService) {}
 
   @Post('/')
   @ApiOperation({ description: 'Create a new permission cluster' })

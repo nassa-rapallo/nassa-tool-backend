@@ -1,59 +1,36 @@
-import { firstValueFrom } from 'rxjs';
 import { CanActivate, Inject, Injectable, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ClientProxy } from '@nestjs/microservices';
-import { PERMISSION_SERVICE, TOKEN_SERVICE, USER_SERVICE } from 'src/clients';
-import { USER_IS_ADMIN, USER_GET } from 'src/clients/user/commands';
 import { Permission } from 'src/shared/Permission';
 import { Role } from 'src/model/Role';
-import * as UserResponses from 'src/modules/user/response';
-import * as UserDtos from 'src/modules/user/dto';
 import { User } from 'src/model/User';
-import { PERMISSION_IS_PERMITTED } from 'src/clients/permission/commands';
-import { IsPermittedResponse } from 'src/modules/permission/response/IsPermittedResponse';
-import { PermissionIsPermittedDto } from 'src/modules/permission/dto/PermissionIsPermittedDto';
+import { UserService } from '../clients/user/user.service';
+import { PermissionService } from '../clients/permission/permission.service';
 
 @Injectable()
 export class ValidationGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
-    @Inject(TOKEN_SERVICE) private readonly tokenServiceClient: ClientProxy,
-    @Inject(USER_SERVICE) private readonly userServiceClient: ClientProxy,
-    @Inject(PERMISSION_SERVICE)
-    private readonly permissionServiceClient: ClientProxy,
+    @Inject() private readonly userService: UserService,
+    @Inject() private readonly permissionService: PermissionService,
   ) {}
 
   private async roleForSection(userId: string, permission: Permission): Promise<Role | undefined> {
-    const userSearchResponse = await firstValueFrom(
-      this.userServiceClient.send<UserResponses.UserGet, UserDtos.UserIdDto>(USER_GET, {
-        id: userId,
-      }),
-    );
+    const { data: userData } = await this.userService.userGet({ id: userId });
 
-    if (!userSearchResponse.data.user) return undefined;
+    if (!userData) return undefined;
 
-    return userSearchResponse.data.user.roles.find((role) => role.section === permission.section);
+    return userData.user.roles.find((role) => role.section.id === permission.section);
   }
 
   private async isAdmin(user: User): Promise<boolean> {
-    const isGlobalAdminResponse = await firstValueFrom(
-      this.userServiceClient.send<UserResponses.UserIsAdmin, UserDtos.IsAdminDto>(USER_IS_ADMIN, {
-        userId: user.id,
-      }),
-    );
-
-    return isGlobalAdminResponse.data.admin;
+    const { data: isAdminData } = await this.userService.userIsAdmin({ userId: user.id });
+    return isAdminData.admin;
   }
 
   private async isSectionAdmin(userId: string, section: string): Promise<boolean> {
-    const isSectionAdminResponse = await firstValueFrom(
-      this.userServiceClient.send<UserResponses.UserIsAdmin, UserDtos.IsAdminDto>(USER_IS_ADMIN, {
-        userId,
-        section,
-      }),
-    );
+    const { data: isAdminData } = await this.userService.userIsAdmin({ userId, section });
 
-    return isSectionAdminResponse.data.admin;
+    return isAdminData.admin;
   }
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -78,17 +55,12 @@ export class ValidationGuard implements CanActivate {
 
     if (!role) return false;
 
-    const isPermitted = await firstValueFrom(
-      this.permissionServiceClient.send<IsPermittedResponse, PermissionIsPermittedDto>(
-        PERMISSION_IS_PERMITTED,
-        {
-          role: role.id,
-          section: permission[0].section,
-          action: permission[0].action,
-        },
-      ),
-    );
+    const { data: isPermittedData } = await this.permissionService.permissionIsPermitted({
+      role: role.id,
+      section: permission[0].section,
+      action: permission[0].action,
+    });
 
-    return isPermitted.data.permitted;
+    return isPermittedData.permitted;
   }
 }

@@ -2,7 +2,7 @@ import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
 import { Inject, Injectable } from '@nestjs/common';
 
-import { ROLE_SERVICE } from '../clientsName';
+import { USER_SERVICE } from '../clientsName';
 
 import * as COMMANDS from './commands';
 import * as Dto from 'src/modules/role/dto';
@@ -11,7 +11,7 @@ import * as Responses from 'src/modules/role/response';
 
 @Injectable()
 export class RoleService {
-  constructor(@Inject(ROLE_SERVICE) private readonly roleClient: ClientProxy) {}
+  constructor(@Inject(USER_SERVICE) private readonly roleClient: ClientProxy) {}
 
   async roleGetAll(): Promise<Responses.RoleGetAll> {
     return firstValueFrom(this.roleClient.send<Responses.RoleGetAll>(COMMANDS.ROLE_GET_ALL, {}));

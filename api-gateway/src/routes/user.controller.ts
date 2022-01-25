@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Inject,
-  Param,
-  Post,
-  Put,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseInterceptors } from '@nestjs/common';
 import { ApiOkResponse, ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
 import { ResponseInterceptor } from 'src/services/interceptor/response.interceptor';
 
@@ -26,8 +16,8 @@ import * as Params from 'src/modules/user/param';
 @ApiTags('users')
 export class UserController {
   constructor(
-    @Inject() private readonly userService: UserService,
-    @Inject() private readonly mailerService: MailerService,
+    private readonly userService: UserService,
+    private readonly mailerService: MailerService,
   ) {}
 
   /* -------------------------------------------------------------------------- */

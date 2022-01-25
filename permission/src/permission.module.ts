@@ -5,9 +5,6 @@ import { TypeOrmConfigService } from './services/config/typeorm-config.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RuleController } from './controllers/rule.controller';
 import { Rule } from './entities/rule.entity';
-import { SectionController } from './controllers/section.controller';
-import { Section } from './entities/section.entity';
-import { SectionService } from './services/section.service';
 import { RuleService } from './services/rule.service';
 
 @Module({
@@ -15,10 +12,10 @@ import { RuleService } from './services/rule.service';
     TypeOrmModule.forRootAsync({
       useClass: TypeOrmConfigService,
     }),
-    TypeOrmModule.forFeature([Rule, Section]),
+    TypeOrmModule.forFeature([Rule]),
   ],
 
-  controllers: [PermissionController, SectionController, RuleController],
-  providers: [PermissionService, SectionService, RuleService],
+  controllers: [PermissionController, RuleController],
+  providers: [PermissionService, RuleService],
 })
 export class PermissionModule {}

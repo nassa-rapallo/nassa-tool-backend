@@ -1,6 +1,6 @@
 import { Provider } from '@nestjs/common';
 import { ClientProxyFactory, Transport } from '@nestjs/microservices';
-import { TOKEN_SERVICE } from 'src/clients';
+import { TOKEN_SERVICE } from 'src/services/clients/clientsName';
 import { ConfigService } from 'src/services/config/config.service';
 
 export const TokenProvider: Provider = {

@@ -25,4 +25,10 @@ export class TokenService {
       ),
     );
   }
+
+  async tokenDecode(data: Dto.DecodeTokenDto): Promise<Responses.DecodeToken> {
+    return firstValueFrom(
+      this.tokenClient.send<Responses.DecodeToken, Dto.DecodeTokenDto>(COMMANDS.TOKEN_DECODE, data),
+    );
+  }
 }

@@ -1,7 +1,7 @@
 import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
 import { Inject, Injectable } from '@nestjs/common';
-import { SECTION_SERVICE } from '../clientsName';
+import { USER_SERVICE } from '../clientsName';
 
 import * as COMMANDS from './commands';
 import * as Dto from 'src/modules/section/dto';
@@ -9,7 +9,7 @@ import * as Responses from 'src/modules/section/response';
 
 @Injectable()
 export class SectionService {
-  constructor(@Inject(SECTION_SERVICE) private readonly sectionClient: ClientProxy) {}
+  constructor(@Inject(USER_SERVICE) private readonly sectionClient: ClientProxy) {}
 
   async sectionGetAll(): Promise<Responses.SectionGetAll> {
     return firstValueFrom(
