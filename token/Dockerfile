@@ -1,4 +1,5 @@
 FROM node:17-alpine
-WORKDIR /opt/app
-RUN yarn
-CMD yarn start:dev
+WORKDIR /usr/app
+COPY package.json .
+RUN yarn --silent
+COPY . .

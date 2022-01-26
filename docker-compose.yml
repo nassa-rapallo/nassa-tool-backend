@@ -1,27 +1,29 @@
 version: "3"
 services:
   api-gateway:
-    build:
-      context: "."
-      dockerfile: "./api-gateway/Dockerfile"
+    build: ./api-gateway
+    command: yarn start:dev
     env_file:
       - .env
       - ./api-gateway/gateway.env
     depends_on:
       - rabbitmq
       - user
+      - token
+      - mailer
+      - permission
     ports:
       - "7000:7000"
     volumes:
-      - ./api-gateway:/opt/app
+      - ./api-gateway:/usr/app
+      - /usr/app/node_modules
     networks:
       - backend
 
   # USER SERVICE CONFIGURATION
   user:
-    build:
-      context: "."
-      dockerfile: "./user/Dockerfile"
+    build: ./user
+    command: yarn start:dev
     depends_on:
       - rabbitmq
       - mailer
@@ -34,7 +36,8 @@ services:
     ports:
       - "7100:7100"
     volumes:
-      - ./user:/opt/app
+      - ./user:/usr/app
+      - /usr/app/node_modules
     networks:
       - backend
   # POSTGRES DB
@@ -53,9 +56,8 @@ services:
 
   # TOKEN SERVICE CONFIGURATION
   token:
-    build:
-      context: "."
-      dockerfile: "./token/Dockerfile"
+    build: ./token
+    command: yarn start:dev
     depends_on:
       - rabbitmq
       - token-db
@@ -67,7 +69,8 @@ services:
     ports:
       - "7101:7101"
     volumes:
-      - ./token:/opt/app
+      - ./token:/usr/app
+      - /usr/app/node_modules
     networks:
       - backend
   # POSTGRES DB
@@ -86,9 +89,8 @@ services:
 
 # PERMISSION SERVICE CONFIGURATION
   permission:
-    build:
-      context: "."
-      dockerfile: "./permission/Dockerfile"
+    build: ./permission
+    command: yarn start:dev
     depends_on:
       - rabbitmq
       - permission-db
@@ -100,7 +102,8 @@ services:
     ports:
       - "7102:7102"
     volumes:
-      - ./permission:/opt/app
+      - ./permission:/usr/app
+      - /usr/app/node_modules
     networks:
       - backend
   # POSTGRES DB
@@ -119,9 +122,8 @@ services:
 
 # MAILER SERVICE CONFIGURATION
   mailer:
-    build:
-      context: "."
-      dockerfile: "./mailer/Dockerfile"
+    build: ./mailer
+    command: yarn start:dev
     depends_on:
       - rabbitmq
     links:
@@ -132,7 +134,8 @@ services:
     ports:
       - "7103:7103"
     volumes:
-      - ./mailer:/opt/app
+      - ./mailer:/usr/app
+      - /usr/app/node_modules
     networks:
       - backend
 

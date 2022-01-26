@@ -9,7 +9,6 @@ import {
 } from 'typeorm';
 
 import { Role } from './role.entity';
-import { DEFAULT_ROLE } from 'src/contants';
 
 @Entity()
 export class User {
@@ -31,7 +30,7 @@ export class User {
   @Column('boolean', { default: false })
   changing_password: boolean;
 
-  @Column({ default: DEFAULT_ROLE })
+  @Column({ default: 'nassarolə' })
   default_role: string;
 
   @ManyToMany(() => Role)
