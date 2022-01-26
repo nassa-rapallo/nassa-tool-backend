@@ -1,4 +1,3 @@
-export type Permission = {
-  section: string;
+export type ActionDecoratorDto = {
   action: string;
 };

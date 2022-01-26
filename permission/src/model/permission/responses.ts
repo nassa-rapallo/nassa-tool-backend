@@ -1,6 +1,7 @@
 import { Rule } from 'src/entities/rule.entity';
 import { Response } from 'src/model/Response';
 
+export type GetPermissionResponse = Promise<Response<{ action: Rule }>>;
 export type CreatePermissionResponse = Promise<Response<{ action: Rule }>>;
 
 export type PermissionResponse = Promise<Response<{ action: Rule }>>;

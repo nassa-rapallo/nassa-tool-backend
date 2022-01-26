@@ -1,8 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsArray, IsString, IsUUID, ValidateNested } from 'class-validator';
+import { IsArray, IsString, IsUUID } from 'class-validator';
 import { ACTION, UUID } from 'src/shared/constants/model';
-import { Section } from './Section';
 
 export class Rule {
   @ApiProperty({ example: UUID, description: 'ID of the Rule' })
@@ -11,9 +9,8 @@ export class Rule {
   id: string;
 
   @ApiProperty({ description: 'Section in which the rule is nested in' })
-  @ValidateNested()
-  @Type(() => Section)
-  section: Section;
+  @IsUUID(4, { message: 'ID must be un UUID' })
+  section: string;
 
   @ApiProperty({ example: ACTION, description: 'Name of the action' })
   @IsString()

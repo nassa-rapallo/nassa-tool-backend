@@ -1,3 +1,4 @@
+import { PERMISSION_GET } from './../model/permission/messages/command';
 import { PERMISSION_IS_PERMITTED } from '../model/permission/messages/command';
 import { Controller, HttpStatus } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
@@ -10,16 +11,9 @@ import {
   CREATE_PERMISSION,
   GET_ROLES,
 } from 'src/model/permission/messages/response';
-import {
-  CreatePermissionResponse,
-  GetRolesForRuleResponse,
-  IsPermittedResponse,
-} from 'src/model/permission/responses';
-import {
-  CreatePermissionDto,
-  GetRolesDto,
-  IsPermittedDto,
-} from 'src/model/permission/dto';
+
+import * as Dto from 'src/model/permission/dto';
+import * as Responses from 'src/model/permission/responses';
 
 @Controller()
 export class PermissionController {
@@ -34,8 +28,31 @@ export class PermissionController {
   /*                                    CRUD                                    */
   /* -------------------------------------------------------------------------- */
 
+  @MessagePattern(PERMISSION_GET)
+  async getPermission(
+    data: Dto.GetPermissionDto,
+  ): Responses.GetPermissionResponse {
+    try {
+      const action = await this.ruleService.getRuleByAction(data);
+
+      return {
+        status: HttpStatus.OK,
+        message: 'success',
+        data: { action },
+      };
+    } catch {
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        message: 'bad_request',
+        data: undefined,
+      };
+    }
+  }
+
   @MessagePattern(PERMISSION_CREATE)
-  async createPermission(data: CreatePermissionDto): CreatePermissionResponse {
+  async createPermission(
+    data: Dto.CreatePermissionDto,
+  ): Responses.CreatePermissionResponse {
     try {
       // search the action in the db
       let responseAction = await this.ruleService.getRuleByAction({
@@ -81,7 +98,9 @@ export class PermissionController {
   /*                               FUNCTIONALITIES                              */
   /* -------------------------------------------------------------------------- */
   @MessagePattern(PERMISSION_GET_ROLES_FOR_RULE)
-  async getRolesForRule(@Payload() data: GetRolesDto): GetRolesForRuleResponse {
+  async getRolesForRule(
+    @Payload() data: Dto.GetRolesDto,
+  ): Responses.GetRolesForRuleResponse {
     try {
       const rule = await this.ruleService.getRuleByAction({
         action: data.action,
@@ -102,10 +121,12 @@ export class PermissionController {
   }
 
   @MessagePattern(PERMISSION_IS_PERMITTED)
-  async isPermitted(@Payload() data: IsPermittedDto): IsPermittedResponse {
+  async isPermitted(
+    @Payload() data: Dto.IsPermittedDto,
+  ): Responses.IsPermittedResponse {
     try {
-      const { roles } = await this.ruleService.getRuleByAction({
-        action: data.action,
+      const { roles } = await this.ruleService.getRuleById({
+        id: data.action,
       });
 
       const isRolePermitted = roles.find((role) => role === data.role)
