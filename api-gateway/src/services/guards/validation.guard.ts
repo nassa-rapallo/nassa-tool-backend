@@ -1,4 +1,4 @@
-import { CanActivate, Inject, Injectable, ExecutionContext } from '@nestjs/common';
+import { CanActivate, Injectable, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Permission } from 'src/shared/Permission';
 import { Role } from 'src/model/Role';
@@ -10,8 +10,8 @@ import { PermissionService } from '../clients/permission/permission.service';
 export class ValidationGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
-    @Inject() private readonly userService: UserService,
-    @Inject() private readonly permissionService: PermissionService,
+    private readonly userService: UserService,
+    private readonly permissionService: PermissionService,
   ) {}
 
   private async roleForSection(userId: string, permission: Permission): Promise<Role | undefined> {

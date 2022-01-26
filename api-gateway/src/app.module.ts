@@ -1,4 +1,4 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigService } from './services/config/config.service';
 
 import { UserModule } from './app/user.module';
@@ -9,8 +9,19 @@ import { SectionModule } from './app/section.module';
 import { TokenModule } from './app/token.module';
 import { HelloModule } from './app/hello.module';
 
+import { GuardsModule } from './app/guards.module';
+
 @Module({
-  imports: [MailerModule, PermissionModule, RoleModule, SectionModule, TokenModule, HelloModule],
+  imports: [
+    UserModule,
+    MailerModule,
+    PermissionModule,
+    RoleModule,
+    SectionModule,
+    TokenModule,
+    HelloModule,
+    GuardsModule,
+  ],
   providers: [ConfigService],
   exports: [ConfigService],
 })

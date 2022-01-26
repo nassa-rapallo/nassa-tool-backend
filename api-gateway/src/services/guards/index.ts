@@ -8,12 +8,12 @@ type GuardProvider = {
   useClass: Type<any>;
 };
 
-const Auth: GuardProvider = {
+export const Auth: GuardProvider = {
   provide: APP_GUARD,
   useClass: AuthGuard,
 };
 
-const Validation: GuardProvider = {
+export const Validation: GuardProvider = {
   provide: APP_GUARD,
   useClass: ValidationGuard,
 };

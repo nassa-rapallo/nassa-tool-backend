@@ -1,4 +1,4 @@
-import { Injectable, Inject, CanActivate, ExecutionContext, HttpException } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, HttpException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { TokenService } from '../clients/token/token.service';
 import { UserService } from '../clients/user/user.service';
