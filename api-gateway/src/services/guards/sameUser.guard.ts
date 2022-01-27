@@ -4,7 +4,7 @@ import { PermissionService } from '../clients/permission/permission.service';
 import { UserService } from '../clients/user/user.service';
 
 @Injectable()
-export class UserOrAdminGuard implements CanActivate {
+export class SameUserGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     private readonly userService: UserService,
@@ -13,6 +13,10 @@ export class UserOrAdminGuard implements CanActivate {
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
+
+    const sameUserGuard = this.reflector.get<boolean>('same-user', context.getHandler());
+    if (!sameUserGuard) return true;
+
     const data = request.data;
     const user = request.user;
 

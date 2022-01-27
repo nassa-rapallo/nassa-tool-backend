@@ -43,7 +43,7 @@ export class ValidationGuard implements CanActivate {
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: { user?: User } = context.switchToHttp().getRequest();
-    const action = this.reflector.get<string[]>('protect-action', context.getHandler());
+    const action = this.reflector.get<string>('protect-action', context.getHandler());
 
     // if there is no permission decorator on the request, then
     // the guard should not run its checks
@@ -57,7 +57,7 @@ export class ValidationGuard implements CanActivate {
     if (isAdmin) return true;
 
     // get action info
-    const { data: actionData } = await this.permissionService.permissionGet({ action: action[0] });
+    const { data: actionData } = await this.permissionService.permissionGet({ action: action });
     if (!actionData) return false;
 
     const roles = await this.roleForSection(request.user.roles, actionData.action.section);
