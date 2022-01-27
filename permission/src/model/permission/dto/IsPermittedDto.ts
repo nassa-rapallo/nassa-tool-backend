@@ -1,3 +1,10 @@
-import { PermissionDto } from './PermissionDto';
+export class IsPermittedDto {
+  // id
+  action: string;
 
-export class IsPermittedDto extends PermissionDto {}
+  // role for the section and global role
+  roles: {
+    section?: string;
+    global?: string;
+  };
+}

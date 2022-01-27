@@ -129,9 +129,15 @@ export class PermissionController {
         id: data.action,
       });
 
-      const isRolePermitted = roles.find((role) => role === data.role)
+      const sectionPermitted = roles.find((role) => role === data.roles.section)
         ? true
         : false;
+
+      const globalPermitted = roles.find((role) => role === data.roles.global)
+        ? true
+        : false;
+
+      const isRolePermitted = sectionPermitted || globalPermitted;
 
       return {
         status: HttpStatus.OK,

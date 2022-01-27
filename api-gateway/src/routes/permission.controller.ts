@@ -1,5 +1,5 @@
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Controller, Inject, Post, Body, UseInterceptors } from '@nestjs/common';
+import { Controller, Post, Body, UseInterceptors } from '@nestjs/common';
 import { ResponseInterceptor } from 'src/services/interceptor/response.interceptor';
 import { PermissionService } from 'src/services/clients/permission/permission.service';
 
