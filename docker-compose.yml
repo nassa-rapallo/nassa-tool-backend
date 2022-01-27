@@ -120,6 +120,39 @@ services:
       - permission-postgres
       - backend
 
+# BOOK SERVICE CONFIGURATION
+  book:
+    build: ./book
+    command: yarn start:dev
+    depends_on:
+      - rabbitmq
+      - book-db
+    links:
+      - rabbitmq
+    env_file:
+      - .env
+      - ./book/book.env
+    ports:
+      - "7102:7102"
+    volumes:
+      - ./book:/usr/app
+      - /usr/app/node_modules
+    networks:
+      - backend
+  # POSTGRES DB
+  book-db:
+    container_name: book-postgres
+    volumes:
+      - /data/book-postgres:/data/postgres
+    env_file:
+      - ./book/book.env
+    image: postgres:alpine
+    ports:
+      - "7202:5432"
+    networks:
+      - book-postgres
+      - backend
+
 # MAILER SERVICE CONFIGURATION
   mailer:
     build: ./mailer
