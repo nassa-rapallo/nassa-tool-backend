@@ -1,8 +1,27 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { Transport, MicroserviceOptions } from '@nestjs/microservices';
+import { BookModule } from './book.module';
+
+// import getAmqUrl from './lib/utils/getAmqUrl';
+import { ConfigService, RabbitConf } from './services/config/config.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
+  const rabbit = new ConfigService().get<RabbitConf>('rabbit');
+
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+    BookModule,
+    {
+      transport: Transport.RMQ,
+      options: {
+        urls: [rabbit.host],
+        queue: rabbit.queue,
+        queueOptions: {
+          durable: true,
+        },
+      },
+    },
+  );
+
+  await app.listen();
 }
 bootstrap();
