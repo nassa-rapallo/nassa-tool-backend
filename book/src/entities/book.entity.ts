@@ -11,7 +11,7 @@ export class Book {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column({ type: 'number', nullable: false })
+  @Column({ type: 'int', nullable: false })
   pageCount: number;
 
   @Column({ type: 'bool', default: false })

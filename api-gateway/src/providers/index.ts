@@ -4,6 +4,7 @@ import { MailerProvider } from './mailer.provider';
 import { PermissionProvider } from './permission.provider';
 import { SectionProvider } from './section.provider';
 import { RoleProvider } from './role.provider';
+import { BookProvider } from './book.provider';
 
 export default [
   MailerProvider,
@@ -12,4 +13,5 @@ export default [
   UserProvider,
   SectionProvider,
   RoleProvider,
+  BookProvider,
 ];

@@ -10,6 +10,7 @@ import { TokenModule } from './app/token.module';
 import { HelloModule } from './app/hello.module';
 
 import { GuardsModule } from './app/guards.module';
+import { BookModule } from './app/book.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { GuardsModule } from './app/guards.module';
     RoleModule,
     SectionModule,
     TokenModule,
+    BookModule,
     HelloModule,
     GuardsModule,
   ],

@@ -4,7 +4,7 @@ import {
 } from './../model/book/responses';
 import { MessagePattern } from '@nestjs/microservices';
 import { BookService } from './../services/book.service';
-import { Controller, Inject, HttpStatus } from '@nestjs/common';
+import { Controller, HttpStatus } from '@nestjs/common';
 import { BOOK_GET_ALL } from 'src/model/book/command';
 import {
   BookGetAllResponse,
@@ -15,7 +15,12 @@ import { BookCreate, BookGet, BookUpdate } from 'src/model/book/dto';
 
 @Controller()
 export class BookController {
-  constructor(@Inject() private readonly bookService: BookService) {}
+  constructor(private readonly bookService: BookService) {}
+
+  @MessagePattern('hello_book')
+  async bookHello(): Promise<string> {
+    return 'Hello from Book!';
+  }
 
   @MessagePattern(BOOK_GET_ALL)
   async bookGetAll(): BookGetAllResponse {

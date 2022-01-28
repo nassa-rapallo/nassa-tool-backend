@@ -3,7 +3,7 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
 import { BOOK_SERVICE } from 'src/services/clients/clientsName';
 import { ConfigService } from 'src/services/config/config.service';
 
-export const MailerProvider: Provider = {
+export const BookProvider: Provider = {
   provide: BOOK_SERVICE,
   useFactory: (configService: ConfigService) => {
     const rabbit = configService.get('rabbit');

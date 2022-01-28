@@ -8,6 +8,7 @@ import { TypeOrmConfigService } from './services/config/typeorm-config.service';
 // book
 import { BookController } from './controllers/book.controller';
 import { Book } from './entities/book.entity';
+import { BookService } from './services/book.service';
 
 @Module({
   imports: [
@@ -17,6 +18,6 @@ import { Book } from './entities/book.entity';
     TypeOrmModule.forFeature([Book]),
   ],
   controllers: [BookController],
-  providers: [ConfigService],
+  providers: [ConfigService, BookService],
 })
 export class BookModule {}
