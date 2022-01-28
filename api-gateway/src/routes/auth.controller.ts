@@ -1,4 +1,4 @@
-import { Body, Controller, HttpStatus, Inject, Post, Req, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Post, Req, UseInterceptors } from '@nestjs/common';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { ResponseInterceptor } from 'src/services/interceptor/response.interceptor';

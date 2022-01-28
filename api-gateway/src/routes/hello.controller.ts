@@ -1,13 +1,18 @@
 import { ClientProxy } from '@nestjs/microservices';
-import { Controller, Inject, Get } from '@nestjs/common';
+import { Controller, Inject, Get, UseInterceptors } from '@nestjs/common';
+import { firstValueFrom } from 'rxjs';
+
 import {
+  BOOK_SERVICE,
   MAILER_SERVICE,
   PERMISSION_SERVICE,
   TOKEN_SERVICE,
   USER_SERVICE,
 } from 'src/services/clients/clientsName';
 
-import { firstValueFrom } from 'rxjs';
+import { ResponseInterceptor } from 'src/services/interceptor/response.interceptor';
+
+@UseInterceptors(ResponseInterceptor)
 @Controller('hello')
 export class HelloController {
   constructor(
@@ -16,6 +21,7 @@ export class HelloController {
     @Inject(PERMISSION_SERVICE)
     private readonly permissionServiceClient: ClientProxy,
     @Inject(MAILER_SERVICE) private readonly mailerServiceClient: ClientProxy,
+    @Inject(BOOK_SERVICE) private readonly bookServiceClient: ClientProxy,
   ) {}
 
   @Get('/user')
@@ -36,5 +42,10 @@ export class HelloController {
   @Get('/permission')
   async permission(): Promise<string> {
     return firstValueFrom(this.permissionServiceClient.send('hello_permission', {}));
+  }
+
+  @Get('/book')
+  async book(): Promise<string> {
+    return firstValueFrom(this.bookServiceClient.send('hello_book', {}));
   }
 }
