@@ -9,15 +9,18 @@ import { TypeOrmConfigService } from './services/config/typeorm-config.service';
 import { BookController } from './controllers/book.controller';
 import { Book } from './entities/book.entity';
 import { BookService } from './services/book.service';
+import { Poll } from './entities/poll.entity';
+import { PollController } from './controllers/poll.controller';
+import { PollService } from './services/poll.service';
 
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
       useClass: TypeOrmConfigService,
     }),
-    TypeOrmModule.forFeature([Book]),
+    TypeOrmModule.forFeature([Book, Poll]),
   ],
-  controllers: [BookController],
-  providers: [ConfigService, BookService],
+  controllers: [BookController, PollController],
+  providers: [ConfigService, BookService, PollService],
 })
 export class BookModule {}

@@ -16,7 +16,7 @@ export class Book {
   pageCount: number;
 
   @Column({ type: 'bool', default: false })
-  alreadyRead: false;
+  alreadyRead: boolean;
 
   @Column({ type: 'uuid', nullable: false })
   userId: string;
