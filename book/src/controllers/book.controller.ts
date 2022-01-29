@@ -1,17 +1,10 @@
-import {
-  BookDeletedResponse,
-  BookGetResponse,
-} from './../model/book/responses';
 import { MessagePattern } from '@nestjs/microservices';
-import { BookService } from './../services/book.service';
 import { Controller, HttpStatus } from '@nestjs/common';
-import { BOOK_GET_ALL } from 'src/model/book/command';
-import {
-  BookGetAllResponse,
-  BookCreateResponse,
-  BookUpdatedResponse,
-} from 'src/model/book/responses';
-import { BookCreate, BookGet, BookUpdate } from 'src/model/book/dto';
+
+import { BookService } from './../services/book.service';
+import * as Dto from 'src/model/book/dto';
+import * as C from 'src/model/book/command';
+import * as R from 'src/model/book/responses';
 
 @Controller()
 export class BookController {
@@ -22,8 +15,12 @@ export class BookController {
     return 'Hello from Book!';
   }
 
-  @MessagePattern(BOOK_GET_ALL)
-  async bookGetAll(): BookGetAllResponse {
+  /* -------------------------------------------------------------------------- */
+  /*                                    CRUD                                    */
+  /* -------------------------------------------------------------------------- */
+
+  @MessagePattern(C.BOOK_GET_ALL)
+  async bookGetAll(): R.BookGetAllResponse {
     try {
       const books = await this.bookService.bookGetAll();
 
@@ -41,7 +38,8 @@ export class BookController {
     }
   }
 
-  async bookGet(data: BookGet): BookGetResponse {
+  @MessagePattern(C.BOOK_GET)
+  async bookGet(data: Dto.BookGet): R.BookGetResponse {
     try {
       const book = await this.bookService.bookGet(data);
 
@@ -59,7 +57,8 @@ export class BookController {
     }
   }
 
-  async bookCreate(data: BookCreate): BookCreateResponse {
+  @MessagePattern(C.BOOK_CREATE)
+  async bookCreate(data: Dto.BookCreate): R.BookCreateResponse {
     try {
       const book = await this.bookService.bookCreate(data);
 
@@ -84,7 +83,8 @@ export class BookController {
     }
   }
 
-  async bookUpdate(data: BookUpdate): BookUpdatedResponse {
+  @MessagePattern(C.BOOK_UPDATE)
+  async bookUpdate(data: Dto.BookUpdate): R.BookUpdatedResponse {
     try {
       await this.bookService.bookUpdate(data);
       const updatedBook = await this.bookService.bookGet({ id: data.id });
@@ -103,7 +103,8 @@ export class BookController {
     }
   }
 
-  async bookDelete(data: BookGet): BookDeletedResponse {
+  @MessagePattern(C.BOOK_DELETE)
+  async bookDelete(data: Dto.BookGet): R.BookDeletedResponse {
     try {
       await this.bookService.bookDelete(data);
 
