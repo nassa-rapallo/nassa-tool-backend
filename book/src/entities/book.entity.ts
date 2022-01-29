@@ -1,3 +1,4 @@
+import { Categories } from 'src/shared/constants';
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -20,9 +21,12 @@ export class Book {
   @Column({ type: 'uuid', nullable: false })
   userId: string;
 
+  // TODO book category -> this can be another entity, but only if we need dynamic categories
+  // anyway, it'd be an easy 1-to-many relationship
+  @Column({ type: 'enum', enum: Categories, default: Categories.Fiction })
+  category: Categories;
+
   // TODO: to implement
-  // book cover -> file upload
-  cover: string;
-  // book category -> other entity
-  category: string;
+  // book cover -> file upload -> do we want it? (ask this!)
+  // cover: string;
 }
