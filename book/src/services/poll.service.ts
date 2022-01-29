@@ -10,6 +10,7 @@ import {
   PollHasVoted,
   PollUpdate,
 } from 'src/model/poll/dto';
+import { PollStatus } from 'src/shared/constants';
 
 @Injectable()
 export class PollService {
@@ -60,5 +61,12 @@ export class PollService {
     );
 
     return true;
+  }
+
+  async pollClose(data: PollGet): Promise<void> {
+    await this.repository.update(
+      { id: data.id },
+      { status: PollStatus.Closed },
+    );
   }
 }

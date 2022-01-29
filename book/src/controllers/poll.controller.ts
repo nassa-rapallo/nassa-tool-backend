@@ -123,7 +123,7 @@ export class PollController {
   /* -------------------------------------------------------------------------- */
 
   @MessagePattern(C.POLL_HAS_VOTED)
-  async pollHasVoted(data: Dto.PollHasVoted): R.PollVoterHasVotedResponses {
+  async pollHasVoted(data: Dto.PollHasVoted): R.PollVoterHasVotedResponse {
     try {
       const hasVoted = await this.pollService.alreadyVoted(data);
 
@@ -142,7 +142,7 @@ export class PollController {
   }
 
   @MessagePattern(C.POLL_ADD_VOTER)
-  async pollAddVoter(data: Dto.PollAddVoter): R.PollAddedVoterResopnse {
+  async pollAddVoter(data: Dto.PollAddVoter): R.PollAddedVoterResponse {
     try {
       const voter = await this.pollService.pollAddVoter(data);
 
@@ -155,7 +155,26 @@ export class PollController {
       return {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'error',
-        data: undefined,
+        data: { added: false, voter: data.userId },
+      };
+    }
+  }
+
+  @MessagePattern(C.POLL_CLOSE)
+  async pollClose(data: Dto.PollGet): R.PollClosedResponse {
+    try {
+      await this.pollService.pollClose(data);
+
+      return {
+        status: HttpStatus.OK,
+        message: 'success',
+        data: { closed: true },
+      };
+    } catch {
+      return {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'error',
+        data: { closed: false },
       };
     }
   }

@@ -16,10 +16,12 @@ export type PollDeletedResponse = Promise<Response<{ deleted: boolean }>>;
 /*                               FUNCTIONALITIES                              */
 /* -------------------------------------------------------------------------- */
 
-export type PollAddedVoterResopnse = Promise<
+export type PollAddedVoterResponse = Promise<
   Response<{ added: boolean; voter: string }>
 >;
 
-export type PollVoterHasVotedResponses = Promise<
+export type PollVoterHasVotedResponse = Promise<
   Response<{ voted: boolean; voter: string }>
 >;
+
+export type PollClosedResponse = Promise<Response<{ closed: boolean }>>;
