@@ -6,6 +6,8 @@ export type RabbitConf = {
 export type EnvConfig = {
   client?: string;
   rabbit?: RabbitConf;
+  role?: string;
+  section?: string;
 };
 
 export class ConfigService {
@@ -18,6 +20,9 @@ export class ConfigService {
       host: process.env.RABBITMQ_FULL_HOST,
       queue: process.env.RABBITMQ_USER_QUEUE_NAME,
     };
+
+    this.envConfig.role = process.env.DEFAULT_ROLE;
+    this.envConfig.section = process.env.GLOBAL_SECTION;
   }
 
   get<ReturnType>(key: keyof EnvConfig): ReturnType {

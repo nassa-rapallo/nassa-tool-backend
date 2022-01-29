@@ -1,3 +1,4 @@
+import { ConfigService } from 'src/services/config/config.service';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
@@ -8,18 +9,29 @@ import { GetByIdDto } from 'src/model/GetByIdDto';
 import { GetByEmailDto } from 'src/model/GetByEmailDto';
 import { ChangingPasswordDto } from 'src/model/user/ChangingPasswordDto';
 import { UpdateUserDto } from 'src/model/user/UpdateUserDto';
+import { Role } from 'src/entities/role.entity';
 
 @Injectable()
 export class UserService {
   constructor(
+    private readonly configService: ConfigService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(Role) private readonly roleRepository: Repository<Role>,
   ) {}
 
   async createUser(createUser: CreateUserDto): Promise<User> {
+    const defaultRole = await this.roleRepository.findOne({
+      where: {
+        name: this.configService.get<string>('role') || '',
+        section: this.configService.get<string>('section') || '',
+      },
+    });
+
     const hashed = await hash(createUser.password, 12);
     const user = await this.userRepository.save({
       ...createUser,
       password: hashed,
+      roles: defaultRole ? [defaultRole] : [],
     });
 
     return user;
