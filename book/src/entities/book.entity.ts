@@ -1,5 +1,11 @@
 import { Categories } from 'src/shared/constants';
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class Book {
@@ -29,4 +35,10 @@ export class Book {
   // TODO: to implement
   // book cover -> file upload -> do we want it? (ask this!)
   // cover: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

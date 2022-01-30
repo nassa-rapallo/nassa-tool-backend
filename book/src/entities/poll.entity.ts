@@ -1,5 +1,11 @@
 import { PollStatus } from 'src/shared/constants';
-import { Column, PrimaryGeneratedColumn, Entity } from 'typeorm';
+import {
+  Column,
+  PrimaryGeneratedColumn,
+  Entity,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class Poll {
@@ -12,6 +18,15 @@ export class Poll {
   @Column({ type: 'enum', enum: PollStatus, default: PollStatus.Open })
   status: PollStatus;
 
+  @Column({ nullable: true })
+  winnerId: string;
+
   @Column({ default: [] })
   userIds: string[];
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
