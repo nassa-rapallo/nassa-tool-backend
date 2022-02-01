@@ -1,4 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Permission } from './permission.entity';
 
 @Entity()
 export class Rule {
@@ -6,11 +14,17 @@ export class Rule {
   id: string;
 
   @Column({ nullable: false })
-  section: string;
+  groupId: string;
 
-  @Column({ nullable: false, unique: true })
-  action: string;
+  @Column('simple-array', { default: [] })
+  cluster: string[];
 
-  @Column('text', { array: true })
-  roles: string[];
+  @ManyToOne(() => Permission, (permission) => permission.rules)
+  permission: Permission;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

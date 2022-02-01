@@ -2,45 +2,37 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 import { Rule } from 'src/entities/rule.entity';
 import { Repository } from 'typeorm';
-import { CreateRuleDto } from 'src/model/rule/dto/CreateRuleDto';
-import { UpdateRuleDto } from 'src/model/rule/dto/UpdateRuleDto';
+
+import * as Dto from 'src/model/rule/dto';
 
 @Injectable()
 export class RuleService {
   constructor(
-    @InjectRepository(Rule) private readonly ruleRepository: Repository<Rule>,
+    @InjectRepository(Rule) private readonly repository: Repository<Rule>,
   ) {}
 
-  async createRule(createRuleDto: CreateRuleDto): Promise<Rule> {
-    return this.ruleRepository.save(createRuleDto);
+  async createRule(data: Dto.Create): Promise<Rule> {
+    return this.repository.save(data);
   }
 
   async getAll(): Promise<Rule[]> {
-    return this.ruleRepository.find();
+    return this.repository.find({ relations: ['permission'] });
   }
 
-  async getRuleById(data: { id: string }): Promise<Rule> {
-    return this.ruleRepository.findOneOrFail({ id: data.id });
-  }
-
-  async getRuleByAction(data: { action: string }): Promise<Rule> {
-    return this.ruleRepository.findOneOrFail({
-      where: { action: data.action },
-    });
-  }
-
-  async deleteRule(data: { id: string }): Promise<void> {
-    await this.ruleRepository.delete({ id: data.id });
-  }
-
-  async updateRule(updateRuleDto: UpdateRuleDto): Promise<Rule> {
-    const rule = await this.getRuleById({ id: updateRuleDto.ruleId });
-
-    await this.ruleRepository.update(
-      { id: updateRuleDto.ruleId },
-      { roles: updateRuleDto.roles },
+  async getRuleById(data: Dto.Get): Promise<Rule> {
+    return this.repository.findOneOrFail(
+      {
+        id: data.id,
+      },
+      { relations: ['permission'] },
     );
+  }
 
-    return { ...rule, roles: updateRuleDto.roles };
+  async deleteRule(data: Dto.Delete): Promise<void> {
+    await this.repository.delete({ id: data.id });
+  }
+
+  async updateRule(data: Dto.Update): Promise<void> {
+    await this.repository.update({ id: data.id }, { ...data.ruleData });
   }
 }

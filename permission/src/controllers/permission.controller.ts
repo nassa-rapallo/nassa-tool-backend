@@ -1,23 +1,19 @@
-import { PERMISSION_GET } from './../model/permission/messages/command';
-import { PERMISSION_IS_PERMITTED } from '../model/permission/messages/command';
-import { Controller, HttpStatus } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
 import { RuleService } from 'src/services/rule.service';
-import {
-  PERMISSION_CREATE,
-  PERMISSION_GET_ROLES_FOR_RULE,
-} from 'src/model/permission/messages/command';
-import {
-  CREATE_PERMISSION,
-  GET_ROLES,
-} from 'src/model/permission/messages/response';
+import { Controller, HttpStatus, Inject } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 
+import * as C from 'src/model/permission/command';
 import * as Dto from 'src/model/permission/dto';
-import * as Responses from 'src/model/permission/responses';
+import { PermissionService } from 'src/services/permission.service';
+import { message } from 'src/shared/message';
+// import * as Response from 'src/model/permission/responses';
 
 @Controller()
 export class PermissionController {
-  constructor(private readonly ruleService: RuleService) {}
+  constructor(
+    @Inject() private readonly service: PermissionService,
+    @Inject() private readonly ruleService: RuleService,
+  ) {}
 
   @MessagePattern('hello_permission')
   getHello(): string {
@@ -28,67 +24,94 @@ export class PermissionController {
   /*                                    CRUD                                    */
   /* -------------------------------------------------------------------------- */
 
-  @MessagePattern(PERMISSION_GET)
-  async getPermission(
-    data: Dto.GetPermissionDto,
-  ): Responses.GetPermissionResponse {
+  @MessagePattern(C.GET_ALL)
+  async permissionGetAll() {
+    const permissions = await this.service.getAll();
+
+    if (permissions)
+      return {
+        status: HttpStatus.OK,
+        message: message(C.GET_ALL, HttpStatus.OK),
+        data: { permissions },
+      };
+
+    return {
+      status: HttpStatus.BAD_REQUEST,
+      message: message(C.GET_ALL, HttpStatus.BAD_REQUEST),
+      data: undefined,
+    };
+  }
+
+  @MessagePattern(C.GET)
+  async permissionGet(@Payload() data: Dto.Get) {
     try {
-      const action = await this.ruleService.getRuleByAction(data);
+      const permission = await this.service.get(data);
 
       return {
         status: HttpStatus.OK,
-        message: 'success',
-        data: { action },
+        message: message(C.GET, HttpStatus.OK),
+        data: { permission },
       };
     } catch {
       return {
         status: HttpStatus.BAD_REQUEST,
-        message: 'bad_request',
+        message: message(C.GET, HttpStatus.BAD_REQUEST),
         data: undefined,
       };
     }
   }
 
-  @MessagePattern(PERMISSION_CREATE)
-  async createPermission(
-    data: Dto.CreatePermissionDto,
-  ): Responses.CreatePermissionResponse {
+  @MessagePattern(C.CREATE)
+  async permissionCreate(@Payload() data: Dto.Create) {
+    const permission = await this.service.create(data);
+
+    if (permission)
+      return {
+        status: HttpStatus.OK,
+        message: message(C.CREATE, HttpStatus.OK),
+        data: { permission: permission },
+      };
+
+    return {
+      status: HttpStatus.BAD_REQUEST,
+      message: message(C.CREATE, HttpStatus.BAD_REQUEST),
+      data: undefined,
+    };
+  }
+
+  @MessagePattern(C.UPDATE)
+  async permissionUpdate(@Payload() data: Dto.Update) {
     try {
-      // search the action in the db
-      let responseAction = await this.ruleService.getRuleByAction({
-        action: data.action,
-      });
-
-      // if no action with the requested name, create a new one
-      if (!responseAction)
-        responseAction = await this.ruleService.createRule({
-          section: data.section,
-          action: data.action,
-          roles: [data.role],
-        });
-
-      // check if the the passed role is already in the action
-      // otherwise, add the role in the rule
-      if (!responseAction.roles.find((r) => r === data.role)) {
-        await this.ruleService.updateRule({
-          ruleId: responseAction.id,
-          roles: [...responseAction.roles, data.role],
-        });
-
-        // this for the cached one, in order to return it in the response object
-        // with the updated roles array
-        responseAction.roles = [...responseAction.roles, data.role];
-      }
+      const permission = await this.service.update(data);
 
       return {
         status: HttpStatus.OK,
-        message: CREATE_PERMISSION.OK,
-        data: { action: responseAction },
+        message: message(C.UPDATE, HttpStatus.OK),
+        data: { permission },
       };
     } catch {
       return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: CREATE_PERMISSION.ERROR,
+        status: HttpStatus.BAD_REQUEST,
+        message: message(C.UPDATE, HttpStatus.BAD_REQUEST),
+        data: undefined,
+      };
+    }
+  }
+
+  @MessagePattern(C.DELETE)
+  async permissionDelete(@Payload() data: Dto.Delete) {
+    try {
+      const permission = await this.service.delete(data);
+
+      return {
+        status: HttpStatus.OK,
+        message: message(C.DELETE, HttpStatus.OK),
+        data: { permission },
+      };
+    } catch {
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        message: message(C.DELETE, HttpStatus.BAD_REQUEST),
         data: undefined,
       };
     }
@@ -97,54 +120,41 @@ export class PermissionController {
   /* -------------------------------------------------------------------------- */
   /*                               FUNCTIONALITIES                              */
   /* -------------------------------------------------------------------------- */
-  @MessagePattern(PERMISSION_GET_ROLES_FOR_RULE)
-  async getRolesForRule(
-    @Payload() data: Dto.GetRolesDto,
-  ): Responses.GetRolesForRuleResponse {
+
+  @MessagePattern(C.PERMITTED)
+  async isPermitted(@Payload() data: Dto.Permitted) {
     try {
-      const rule = await this.ruleService.getRuleByAction({
-        action: data.action,
+      const permission = await this.service.getByAction({
+        actionId: data.actionId,
       });
+
+      let isPermitted = false;
+
+      // if there is no permission for the action, then it's not protected
+      if (!permission) return true;
+
+      // check for all the user role
+      for (const userRole of data.userRoles) {
+        // is there a group cluster within the permission configuration?
+        const foundRule = permission.rules.find(
+          (rule) => rule.groupId === userRole.groupId,
+        );
+
+        // if there is, let's check if the userRole is in the cluster
+        if (foundRule) {
+          isPermitted = foundRule.cluster.includes(userRole.roleId);
+
+          // if it is, break from the loop
+          if (isPermitted) break;
+        }
+      }
 
       return {
         status: HttpStatus.OK,
-        message: GET_ROLES.OK,
-        data: { roles: rule.roles },
-      };
-    } catch (e) {
-      return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: GET_ROLES.ERROR,
-        data: null,
-      };
-    }
-  }
-
-  @MessagePattern(PERMISSION_IS_PERMITTED)
-  async isPermitted(
-    @Payload() data: Dto.IsPermittedDto,
-  ): Responses.IsPermittedResponse {
-    try {
-      const { roles } = await this.ruleService.getRuleById({
-        id: data.action,
-      });
-
-      const sectionPermitted = roles.find((role) => role === data.roles.section)
-        ? true
-        : false;
-
-      const globalPermitted = roles.find((role) => role === data.roles.global)
-        ? true
-        : false;
-
-      const isRolePermitted = sectionPermitted || globalPermitted;
-
-      return {
-        status: HttpStatus.OK,
-        message: isRolePermitted
-          ? 'permisssion_is_permitted'
+        message: isPermitted
+          ? 'permission_is_permitted'
           : 'permission_is_not_permitted',
-        data: { permitted: isRolePermitted },
+        data: { permitted: isPermitted },
       };
     } catch {
       return {

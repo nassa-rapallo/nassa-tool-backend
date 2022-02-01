@@ -1,123 +1,111 @@
-import {
-  RULE_CREATE,
-  RULE_DELETE,
-  RULE_GET_BY_ID,
-  RULE_UPDATE,
-} from './../model/rule/messages/commands';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { Controller, HttpStatus } from '@nestjs/common';
+import { Controller, HttpStatus, Inject } from '@nestjs/common';
 import { RuleService } from 'src/services/rule.service';
-import { RULE_RESPONSE } from 'src/model/rule/messages/response';
-import { CreateRuleDto, UpdateRuleDto } from 'src/model/rule/dto';
-import { AllRulesResponse, RuleResponse } from 'src/model/rule/responses';
+
+import * as C from 'src/model/rule/command';
+import * as Dto from 'src/model/rule/dto';
+import { message } from 'src/shared/message';
 
 @Controller()
 export class RuleController {
-  constructor(private readonly ruleService: RuleService) {}
+  constructor(@Inject() private readonly service: RuleService) {}
 
-  @MessagePattern(RULE_CREATE)
-  async ruleCreate(@Payload() createRuleDto: CreateRuleDto): RuleResponse {
+  @MessagePattern(C.CREATE)
+  async ruleCreate(@Payload() data: Dto.Create) {
     try {
-      const rule = await this.ruleService.createRule(createRuleDto);
+      const rule = await this.service.createRule(data);
 
       return {
-        status: HttpStatus.CREATED,
-        message: RULE_RESPONSE.CREATE.CREATED,
+        status: HttpStatus.OK,
+        message: message(C.CREATE, HttpStatus.OK),
         data: { rule },
       };
     } catch (e) {
       return {
-        status: HttpStatus.PRECONDITION_FAILED,
-        message: RULE_RESPONSE.CREATE.BAD_REQUEST,
-        data: null,
-        errors: [e.driverError.detail],
+        status: HttpStatus.BAD_REQUEST,
+        message: message(C.CREATE, HttpStatus.BAD_REQUEST),
+        data: undefined,
       };
     }
   }
 
-  async ruleGetAll(): AllRulesResponse {
+  async ruleGetAll() {
     try {
-      const rules = await this.ruleService.getAll();
+      const rules = await this.service.getAll();
 
       if (!rules)
         return {
           status: HttpStatus.NOT_FOUND,
-          message: RULE_RESPONSE.GET_ALL.NOT_FOUND,
-          data: null,
+          message: message(C.GET_ALL, HttpStatus.BAD_REQUEST),
+          data: undefined,
         };
 
       return {
-        status: HttpStatus.FOUND,
-        message: RULE_RESPONSE.GET_ALL.FOUND,
+        status: HttpStatus.OK,
+        message: message(C.GET_ALL, HttpStatus.OK),
         data: { rules },
       };
-    } catch (e) {
+    } catch {
       return {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: RULE_RESPONSE.GET_ALL.SERVER_ERROR,
-        data: null,
-        errors: [e.driverError.detail],
+        message: message(C.GET_ALL, HttpStatus.INTERNAL_SERVER_ERROR),
+        data: undefined,
       };
     }
   }
 
-  @MessagePattern(RULE_GET_BY_ID)
-  async ruleGetById(@Payload() data: { id: string }): Promise<RuleResponse> {
+  @MessagePattern(C.GET)
+  async ruleGetById(@Payload() data: Dto.Get) {
     try {
-      const rule = await this.ruleService.getRuleById({ id: data.id });
+      const rule = await this.service.getRuleById({ id: data.id });
 
       return {
-        status: HttpStatus.FOUND,
-        message: RULE_RESPONSE.GET_BY_ID.FOUND,
+        status: HttpStatus.OK,
+        message: message(C.GET, HttpStatus.OK),
         data: { rule },
       };
-    } catch (e) {
+    } catch {
       return {
-        status: HttpStatus.NOT_FOUND,
-        message: RULE_RESPONSE.GET_BY_ID.NOT_FOUND,
-        data: null,
-        errors: [e.driverError.detail],
+        status: HttpStatus.BAD_REQUEST,
+        message: message(C.GET, HttpStatus.BAD_REQUEST),
+        data: undefined,
       };
     }
   }
 
-  @MessagePattern(RULE_UPDATE)
-  async ruleUpdate(
-    @Payload() updateRuleDto: UpdateRuleDto,
-  ): Promise<RuleResponse> {
+  @MessagePattern(C.UPDATE)
+  async ruleUpdate(@Payload() data: Dto.Update) {
     try {
-      const updated = await this.ruleService.updateRule(updateRuleDto);
+      await this.service.updateRule(data);
       return {
         status: HttpStatus.OK,
-        message: RULE_RESPONSE.UPDATE.UPDATED,
-        data: { rule: updated },
+        message: message(C.UPDATE, HttpStatus.OK),
+        data: { updated: true },
       };
-    } catch (e) {
+    } catch {
       return {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: RULE_RESPONSE.UPDATE.SERVER_ERROR,
-        data: null,
-        errors: [e.driverError.detail],
+        message: message(C.UPDATE, HttpStatus.INTERNAL_SERVER_ERROR),
+        data: { updated: false },
       };
     }
   }
 
-  @MessagePattern(RULE_DELETE)
-  async ruleDelete(@Payload() data: { id: string }): Promise<RuleResponse> {
+  @MessagePattern(C.DELETE)
+  async ruleDelete(@Payload() data: Dto.Delete) {
     try {
-      await this.ruleService.deleteRule(data);
+      await this.service.deleteRule(data);
 
       return {
         status: HttpStatus.OK,
-        message: RULE_RESPONSE.DELETE.DELETED,
-        data: null,
+        message: message(C.DELETE, HttpStatus.OK),
+        data: { deleted: true },
       };
     } catch (e) {
       return {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: RULE_RESPONSE.DELETE.SERVER_ERROR,
-        data: null,
-        errors: [e.driverError.detail],
+        message: message(C.DELETE, HttpStatus.INTERNAL_SERVER_ERROR),
+        data: { delete: false },
       };
     }
   }

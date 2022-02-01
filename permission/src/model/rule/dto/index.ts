@@ -1,4 +1,6 @@
-import { UpdateRuleDto } from './UpdateRuleDto';
-import { CreateRuleDto } from './CreateRuleDto';
+import { Get } from './Get';
+import { Create } from './Create';
+import { Delete } from './Delete';
+import { Update } from './Update';
 
-export { CreateRuleDto, UpdateRuleDto };
+export { Create, Delete, Get, Update };

@@ -30,7 +30,7 @@ export class User {
   @Column('boolean', { default: false })
   changing_password: boolean;
 
-  @Column({ default: 'nassarolə' })
+  @Column({ default: 'Nassarolə' })
   default_role: string;
 
   @ManyToMany(() => Role)

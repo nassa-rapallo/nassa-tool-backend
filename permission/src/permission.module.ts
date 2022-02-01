@@ -6,13 +6,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RuleController } from './controllers/rule.controller';
 import { Rule } from './entities/rule.entity';
 import { RuleService } from './services/rule.service';
+import { Permission } from './entities/permission.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
       useClass: TypeOrmConfigService,
     }),
-    TypeOrmModule.forFeature([Rule]),
+    TypeOrmModule.forFeature([Permission, Rule]),
   ],
 
   controllers: [PermissionController, RuleController],

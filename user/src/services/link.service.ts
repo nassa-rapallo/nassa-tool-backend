@@ -17,7 +17,6 @@ export class LinkService {
 
   async createLink(data: CreateLinkDto): Promise<Link> {
     const linkId = uuid();
-    console.log('----LINK', linkId);
     return this.linkRepository.save({
       user_id: data.user_id,
       type: data.type,
