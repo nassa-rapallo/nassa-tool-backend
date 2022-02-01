@@ -4,7 +4,8 @@
     "./user",
     "./token",
     "./mailer",
-    "./permission"
+    "./permission",
+    "./group"
   ],
   "workbench.colorCustomizations": {
     "activityBar.background": "#362D08",

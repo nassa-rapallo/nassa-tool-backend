@@ -120,6 +120,39 @@ services:
       - permission-postgres
       - backend
 
+# GROUP SERVICE CONFIGURATION
+  group:
+    build: ./group
+    command: yarn start:dev
+    depends_on:
+      - rabbitmq
+      - group-db
+    links:
+      - rabbitmq
+    env_file:
+      - .env
+      - ./group/group.env
+    ports:
+      - "7105:7105"
+    volumes:
+      - ./group:/usr/app
+      - /usr/app/node_modules
+    networks:
+      - backend
+  # POSTGRES DB
+  group-db:
+    container_name: group-postgres
+    volumes:
+      - /data/group-postgres:/data/postgres
+    env_file:
+      - ./group/group.env
+    image: postgres:alpine
+    ports:
+      - "7205:5432"
+    networks:
+      - group-postgres
+      - backend
+
 # MAILER SERVICE CONFIGURATION
   mailer:
     build: ./mailer
@@ -132,7 +165,7 @@ services:
       - .env
       - ./mailer/mailer.env
     ports:
-      - "7103:7103"
+      - "7120:7120"
     volumes:
       - ./mailer:/usr/app
       - /usr/app/node_modules
@@ -162,4 +195,6 @@ networks:
   token-postgres:
     driver: bridge
   permission-postgres:
+    driver: bridge
+  group-postgres:
     driver: bridge
