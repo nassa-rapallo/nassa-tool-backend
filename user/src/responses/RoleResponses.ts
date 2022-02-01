@@ -1,5 +1,5 @@
 import { Role } from 'src/entities/role.entity';
-import { Response } from './Response';
+import { Response } from '../shared/Response';
 
 export type RoleResponse = Promise<Response<{ role: Partial<Role> }>>;
 

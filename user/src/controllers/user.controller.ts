@@ -1,45 +1,19 @@
-import {
-  UserDeletedResponse,
-  UserLinkResponse,
-  UserResponse,
-  UserSearchAllResponse,
-  UserUpdatedResponse,
-} from './../responses/UserResponses';
 import { Controller, HttpStatus } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UserService } from '../services/user.service';
-import { CreateUserDto } from '../model/user/CreateUserDto';
-import { UserCredentialsDto } from '../model/user/UserCredentialsDto';
-import {
-  USER_ADD_ROLE,
-  USER_CREATE,
-  USER_GET_ALL,
-  USER_SEARCH_BY_CREDENTIALS,
-  USER_GET,
-  USER_DELETE,
-  USER_UPDATE,
-} from '../messages/command';
-import {
-  ADD_ROLE_TO_USER,
-  CREATE_USER,
-  SEARCH_BY_CREDENTIALS,
-  GET_USER,
-  DELETE_USER,
-  UPDATE_USER,
-} from '../messages/response';
-import { UserSearchResponse } from '../responses/UserResponses';
-import { RoleService } from 'src/services/role.service';
-import { Connection } from 'typeorm';
-import { LinkService } from 'src/services/link.service';
+
 import { TYPES } from 'src/entities/link.entity';
-import { AddRoleDto } from 'src/model/user/AddRoleDto';
-import { GetByIdDto } from 'src/model/GetByIdDto';
-import { UpdateUserDto } from 'src/model/user/UpdateUserDto';
+import { RoleService } from 'src/services/role.service';
+import { LinkService } from 'src/services/link.service';
+
+import * as C from 'src/model/user/command';
+import * as Dto from 'src/model/user/dto';
+import * as Response from 'src/model/user/responses';
+import { message } from 'src/shared/message';
 
 @Controller()
 export class UserController {
   constructor(
-    private readonly connection: Connection,
     private readonly roleService: RoleService,
     private readonly userService: UserService,
     private readonly linkService: LinkService,
@@ -50,25 +24,25 @@ export class UserController {
     return 'Hello from User';
   }
 
-  @MessagePattern(USER_CREATE)
-  async createUser(@Payload() createUser: CreateUserDto): UserLinkResponse {
+  @MessagePattern(C.CREATE)
+  async createUser(@Payload() data: Dto.Create): Response.UserLink {
     try {
-      const created = await this.userService.createUser(createUser);
+      const created = await this.userService.create(data);
       if (!created)
         return {
           status: HttpStatus.BAD_REQUEST,
-          message: CREATE_USER.BAD_REQUEST,
-          data: null,
+          message: message(C.CREATE, HttpStatus.BAD_REQUEST),
+          data: undefined,
         };
 
-      const userLink = await this.linkService.createLink({
+      const userLink = await this.linkService.create({
         user_id: created.id,
         type: TYPES.CONFIRM,
       });
 
       return {
-        status: HttpStatus.CREATED,
-        message: CREATE_USER.CREATED,
+        status: HttpStatus.OK,
+        message: message(C.CREATE, HttpStatus.OK),
         data: {
           user: created,
           link: await this.linkService.getWebLink({ link: userLink.link }),
@@ -76,124 +50,102 @@ export class UserController {
       };
     } catch (e) {
       return {
-        status: HttpStatus.PRECONDITION_FAILED,
-        message: CREATE_USER.BAD_REQUEST,
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: message(C.CREATE, HttpStatus.INTERNAL_SERVER_ERROR),
         data: null,
-        errors: [e.driverError.detail],
       };
     }
   }
 
-  @MessagePattern(USER_DELETE)
-  async deleteUser(@Payload() deleteUser: GetByIdDto): UserDeletedResponse {
+  @MessagePattern(C.DELETE)
+  async deleteUser(@Payload() data: Dto.Get): Response.UserDeleted {
     try {
-      await this.userService.deleteUser(deleteUser);
+      await this.userService.delete(data);
 
       return {
         status: HttpStatus.OK,
-        message: DELETE_USER.SUCCESS,
+        message: message(C.DELETE, HttpStatus.OK),
         data: { deleted: true },
       };
     } catch {
       return {
         status: HttpStatus.BAD_REQUEST,
-        message: DELETE_USER.ERROR,
+        message: message(C.DELETE, HttpStatus.BAD_REQUEST),
         data: { deleted: false },
       };
     }
   }
 
-  @MessagePattern(USER_UPDATE)
-  async updateUser(@Payload() updateUser: UpdateUserDto): UserUpdatedResponse {
+  @MessagePattern(C.UPDATE)
+  async updateUser(@Payload() data: Dto.Update): Response.UserUpdated {
     try {
-      await this.userService.updateUser(updateUser);
-
-      const updatedUser = await this.userService.searchById({
-        id: updateUser.id,
-      });
+      await this.userService.update(data);
 
       return {
         status: HttpStatus.OK,
-        message: UPDATE_USER.SUCCESS,
-        data: { updated: true, user: updatedUser },
+        message: message(C.UPDATE, HttpStatus.OK),
+        data: { updated: true },
       };
     } catch {
       return {
         status: HttpStatus.BAD_REQUEST,
-        message: UPDATE_USER.ERROR,
+        message: message(C.UPDATE, HttpStatus.BAD_REQUEST),
         data: { updated: false },
       };
     }
   }
 
-  @MessagePattern(USER_GET_ALL)
-  async getAllUsers(): UserSearchAllResponse {
+  @MessagePattern(C.GET_ALL)
+  async getAllUsers(): Response.UserGetAll {
     try {
-      const users = await this.userService.getUsers();
+      const users = await this.userService.getAll();
 
       return {
         status: HttpStatus.OK,
-        message: 'success',
+        message: message(C.GET_ALL, HttpStatus.OK),
         data: { users },
       };
-    } catch (e) {
+    } catch {
       return {
-        status: HttpStatus.NOT_FOUND,
-        message: 'not found',
-        data: null,
+        status: HttpStatus.BAD_REQUEST,
+        message: message(C.GET_ALL, HttpStatus.BAD_REQUEST),
+        data: undefined,
       };
     }
   }
 
-  @MessagePattern(USER_GET)
-  public async getUserById(@Payload() data: GetByIdDto): UserSearchResponse {
-    // WRONG DATA
-    if (!data.id)
-      return {
-        status: HttpStatus.BAD_REQUEST,
-        message: GET_USER.BAD_REQUEST,
-        data: null,
-      };
+  @MessagePattern(C.GET)
+  public async getUserById(@Payload() data: Dto.Get): Response.UserGet {
+    const user = await this.userService.get({ id: data.id });
 
-    const user = await this.userService.searchById({ id: data.id });
-
-    // WRONG ID
     if (!user)
       return {
-        status: HttpStatus.NOT_FOUND,
-        message: GET_USER.NOT_FOUND,
-        data: null,
+        status: HttpStatus.BAD_REQUEST,
+        message: message(C.GET, HttpStatus.BAD_REQUEST),
+        data: undefined,
       };
 
     // SUCCESS
     return {
-      status: HttpStatus.FOUND,
-      message: GET_USER.SUCCESS,
+      status: HttpStatus.OK,
+      message: message(C.GET, HttpStatus.OK),
       data: { user },
     };
   }
 
-  @MessagePattern(USER_SEARCH_BY_CREDENTIALS)
+  @MessagePattern(C.SEARCH_BY_CREDENTIALS)
   async getUserByCredentials(
-    @Payload() userCredentials: UserCredentialsDto,
-  ): UserSearchResponse {
-    // WRONG REQUEST
-    if (!userCredentials || !userCredentials.email || !userCredentials.password)
-      return {
-        status: HttpStatus.NOT_FOUND,
-        message: SEARCH_BY_CREDENTIALS.NOT_FOUND,
-        data: null,
-      };
-
-    const user = await this.userService.searchByEmail({
+    @Payload() userCredentials: Dto.Credentials,
+  ): Response.UserGet {
+    const user = await this.userService.getByEmail({
       email: userCredentials.email,
     });
 
     // WRONG EMAIL
     if (!user)
       return {
-        status: HttpStatus.NOT_FOUND,
-        message: SEARCH_BY_CREDENTIALS.NOT_FOUND,
+        status: HttpStatus.BAD_REQUEST,
+        message: message(C.SEARCH_BY_CREDENTIALS, HttpStatus.BAD_REQUEST),
         data: null,
       };
 
@@ -206,70 +158,55 @@ export class UserController {
     // WRONG PASSWORD
     if (!verifiedPassword) {
       return {
-        status: HttpStatus.NOT_FOUND,
-        message: SEARCH_BY_CREDENTIALS.NOT_MATCH,
+        status: HttpStatus.BAD_REQUEST,
+        message: message(C.SEARCH_BY_CREDENTIALS, HttpStatus.BAD_REQUEST),
         data: null,
       };
     }
 
     // SUCCESS
     return {
-      status: HttpStatus.FOUND,
-      message: SEARCH_BY_CREDENTIALS.SUCCESS,
+      status: HttpStatus.OK,
+      message: message(C.SEARCH_BY_CREDENTIALS, HttpStatus.OK),
       data: {
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          roles: user.roles,
-        },
+        user,
       },
     };
   }
 
-  @MessagePattern(USER_ADD_ROLE)
-  public async addRoleToUser(@Payload() data: AddRoleDto): UserResponse {
-    const user = await this.userService.searchById({ id: data.userId });
-    if (!user)
-      return {
-        status: HttpStatus.NOT_FOUND,
-        message: ADD_ROLE_TO_USER.USER_NOT_FOUND,
-        data: null,
-      };
-
-    const role = await this.roleService.getRoleById({ id: data.roleId });
-
-    if (!role)
-      return {
-        status: HttpStatus.NOT_FOUND,
-        message: ADD_ROLE_TO_USER.ROLE_NOT_FOUND,
-        data: null,
-      };
-
-    const sectionIdx = user.roles.findIndex((r) => r.section === role.section);
-
-    if (sectionIdx !== -1)
-      return {
-        status: HttpStatus.BAD_REQUEST,
-        message: ADD_ROLE_TO_USER.BAD_REQUEST,
-        data: null,
-      };
-
-    user.roles = [role, ...user.roles];
-
+  @MessagePattern(C.ADD_ROLE)
+  public async addRoleToUser(@Payload() data: Dto.AddRole): Response.UserGet {
     try {
-      const updatedUser = await this.connection.manager.save(user);
+      const user = await this.userService.get({ id: data.userId });
+      const role = await this.roleService.getByCluster({
+        roleId: data.roleId,
+        groupId: data.groupId,
+      });
+
+      if (!role)
+        return {
+          status: HttpStatus.BAD_REQUEST,
+          message: message(C.ADD_ROLE, HttpStatus.BAD_REQUEST),
+          data: undefined,
+        };
+
+      const cleanedRoles = user.roles.filter((u) => u.groupId === role.groupId);
+      const newRoles = [...cleanedRoles, role];
+
+      user.roles = [...newRoles];
+
+      await this.userService.save({ user });
 
       return {
         status: HttpStatus.OK,
-        message: ADD_ROLE_TO_USER.SUCCESS,
-        data: { user: updatedUser },
+        message: message(C.ADD_ROLE, HttpStatus.OK),
+        data: { user },
       };
     } catch {
       return {
         status: HttpStatus.BAD_REQUEST,
-        message: ADD_ROLE_TO_USER.BAD_REQUEST,
-        data: null,
+        message: message(C.ADD_ROLE, HttpStatus.BAD_REQUEST),
+        data: undefined,
       };
     }
   }

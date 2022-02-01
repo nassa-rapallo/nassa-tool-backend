@@ -2,65 +2,57 @@ import { ConfigService } from 'src/services/config/config.service';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
-import { CreateUserDto } from 'src/model/user/CreateUserDto';
-import { Repository } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 import { hash, compare } from 'bcrypt';
-import { GetByIdDto } from 'src/model/GetByIdDto';
-import { GetByEmailDto } from 'src/model/GetByEmailDto';
-import { ChangingPasswordDto } from 'src/model/user/ChangingPasswordDto';
-import { UpdateUserDto } from 'src/model/user/UpdateUserDto';
 import { Role } from 'src/entities/role.entity';
+
+import * as Dto from 'src/model/user/dto';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly configService: ConfigService,
+    private readonly connection: Connection,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     @InjectRepository(Role) private readonly roleRepository: Repository<Role>,
   ) {}
 
-  async createUser(createUser: CreateUserDto): Promise<User> {
-    const defaultRole = await this.roleRepository.findOne({
-      where: {
-        name: this.configService.get<string>('role') || '',
-        section: this.configService.get<string>('section') || '',
-      },
-    });
-
-    const hashed = await hash(createUser.password, 12);
-    const user = await this.userRepository.save({
-      ...createUser,
-      password: hashed,
-      roles: defaultRole ? [defaultRole] : [],
-    });
-
-    return user;
+  async save(data: { user: User }): Promise<void> {
+    await this.connection.manager.save(data.user);
   }
 
-  async getUsers() {
-    return this.userRepository.find();
+  async getAll(): Promise<User[]> {
+    return this.userRepository.find({ relations: ['roles'] });
   }
 
-  async updateUser(data: UpdateUserDto): Promise<void> {
-    await this.userRepository.update({ id: data.id }, { ...data.userData });
-  }
-
-  async deleteUser(data: GetByIdDto): Promise<void> {
-    await this.userRepository.delete({ id: data.id });
-  }
-
-  async searchByEmail(data: GetByEmailDto): Promise<User | undefined> {
-    return this.userRepository.findOne({
+  async getByEmail(data: Dto.GetByEmail): Promise<User> {
+    return this.userRepository.findOneOrFail({
       where: { email: data.email },
       relations: ['roles'],
     });
   }
 
-  async searchById(data: GetByIdDto): Promise<User | undefined> {
+  async get(data: Dto.Get): Promise<User> {
     return this.userRepository.findOneOrFail({
       where: { id: data.id },
       relations: ['roles'],
     });
+  }
+
+  async create(data: Dto.Create): Promise<User> {
+    const hashed = await hash(data.password, 12);
+    return this.userRepository.save({
+      ...data,
+      password: hashed,
+    });
+  }
+
+  async update(data: Dto.Update): Promise<void> {
+    await this.userRepository.update({ id: data.id }, { ...data.userData });
+  }
+
+  async delete(data: Dto.Get): Promise<void> {
+    await this.userRepository.delete({ id: data.id });
   }
 
   async verifyPassword(user: User, password: string): Promise<boolean> {
@@ -68,16 +60,11 @@ export class UserService {
     return compared;
   }
 
-  async isAdmin(user: User, section: string): Promise<boolean> {
-    const userRole = user.roles.find((role) => role.section.name === section);
-    return userRole ? userRole.isAdmin : false;
-  }
-
-  async confirmUser(data: GetByIdDto): Promise<void> {
+  async confirm(data: Dto.Get): Promise<void> {
     await this.userRepository.update({ id: data.id }, { confirmed: true });
   }
 
-  async toggleChangingPassword(data: ChangingPasswordDto): Promise<void> {
+  async toggleChangingPassword(data: Dto.ChangingPassword): Promise<void> {
     await this.userRepository.update(
       { id: data.id },
       { changing_password: data.operation },

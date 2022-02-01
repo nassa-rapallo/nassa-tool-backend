@@ -1,11 +1,11 @@
-import { GetLinkDto } from '../model/link/GetLinkDto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Link } from 'src/entities/link.entity';
-import { CreateLinkDto } from 'src/model/link/CreateLinkDto';
 import { Repository } from 'typeorm';
 import { ConfigService } from './config/config.service';
 import { v4 as uuid } from 'uuid';
+
+import * as Dto from 'src/model/link/dto';
 
 @Injectable()
 export class LinkService {
@@ -15,7 +15,7 @@ export class LinkService {
     private readonly configService: ConfigService,
   ) {}
 
-  async createLink(data: CreateLinkDto): Promise<Link> {
+  async create(data: Dto.CreateLink): Promise<Link> {
     const linkId = uuid();
     return this.linkRepository.save({
       user_id: data.user_id,
@@ -24,7 +24,7 @@ export class LinkService {
     });
   }
 
-  async getLinkFromData({ user_id, type }: GetLinkDto): Promise<Link> {
+  async getLinkFromData({ user_id, type }: Dto.GetLink): Promise<Link> {
     return this.linkRepository.findOneOrFail({
       where: { user_id, type, is_used: false },
     });

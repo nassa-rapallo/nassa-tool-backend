@@ -1,16 +1,13 @@
 import { Controller, HttpStatus } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
-import { USER_CHANGE_PASSWORD, USER_CONFIRM_LINK } from 'src/messages/command';
-import { CONFIRM_LINK } from 'src/messages/response';
 import { LinkService } from 'src/services/link.service';
 import { UserService } from 'src/services/user.service';
 import { hash } from 'argon2';
-import {
-  ChangePasswordResponse,
-  ConfirmUserResponse,
-} from 'src/responses/LinkResponses';
-import { ConfirmUserDto } from 'src/model/link/ConfirmUserDto';
-import { ChangePasswordDto } from 'src/model/link/ChangePasswordDto';
+
+import * as Dto from 'src/model/link/dto';
+import * as C from 'src/model/link/command';
+import * as Response from 'src/model/link/responses';
+import { message } from 'src/shared/message';
 
 @Controller()
 export class LinkController {
@@ -19,31 +16,33 @@ export class LinkController {
     private readonly userService: UserService,
   ) {}
 
-  @MessagePattern(USER_CONFIRM_LINK)
-  async confirmUser(data: ConfirmUserDto): ConfirmUserResponse {
+  @MessagePattern(C.CONFIRM_LINK)
+  async confirmUser(data: Dto.ChangePassword): Response.ConfirmUser {
     try {
       const userLink = await this.linkService.getLink({ link: data.link });
       await this.linkService.useLink({ link: userLink.link });
-      await this.userService.confirmUser({ id: userLink.user_id });
+      await this.userService.confirm({ id: userLink.user_id });
 
       return {
         status: HttpStatus.OK,
-        message: CONFIRM_LINK.SUCCESS,
+        message: message(C.CONFIRM_LINK, HttpStatus.OK),
         data: { confirmed: true },
       };
     } catch (e) {
       return {
         status: HttpStatus.BAD_REQUEST,
-        message: CONFIRM_LINK.BAD_REQUEST,
+        message: message(C.CONFIRM_LINK, HttpStatus.OK),
         data: { confirmed: false },
       };
     }
   }
 
-  @MessagePattern(USER_CHANGE_PASSWORD)
-  public async changePassword(data: ChangePasswordDto): ChangePasswordResponse {
+  @MessagePattern(C.CHANGE_PASSWORD)
+  public async changePassword(
+    data: Dto.ChangePassword,
+  ): Response.ChangePassword {
     try {
-      const user = await this.userService.searchById({ id: data.id });
+      const user = await this.userService.get({ id: data.id });
 
       if (!user.changing_password)
         return {
@@ -54,7 +53,7 @@ export class LinkController {
 
       const newPassword = await hash(data.newPassword);
 
-      await this.userService.updateUser({
+      await this.userService.update({
         id: user.id,
         userData: { changing_password: false, password: newPassword },
       });

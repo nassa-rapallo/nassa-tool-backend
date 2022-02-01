@@ -1,4 +1,4 @@
-import { Response } from './Response';
+import { Response } from '../shared/Response';
 
 export type ConfirmUserResponse = Promise<Response<{ confirmed: boolean }>>;
 
