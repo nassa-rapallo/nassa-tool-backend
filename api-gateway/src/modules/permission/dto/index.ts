@@ -1,5 +1,8 @@
-import { GetPermissionDto } from './GetPermissionDto';
-import { CreatePermissionDto } from './CreatePermissionDto';
-import { PermissionIsPermittedDto } from './PermissionIsPermittedDto';
+import { GetByAction } from './GetByAction';
+import { Permitted } from './Permitted';
+import { Get } from './Get';
+import { Create } from './Create';
+import { Delete } from './Delete';
+import { Update } from './Update';
 
-export { CreatePermissionDto, PermissionIsPermittedDto, GetPermissionDto };
+export { Create, Delete, Get, Update, Permitted, GetByAction };

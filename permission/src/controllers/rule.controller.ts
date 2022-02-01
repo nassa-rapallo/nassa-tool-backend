@@ -29,6 +29,7 @@ export class RuleController {
     }
   }
 
+  @MessagePattern(C.GET_ALL)
   async ruleGetAll() {
     try {
       const rules = await this.service.getAll();

@@ -1,5 +1,7 @@
-export const ROLE_CREATE = 'user_create_role';
-export const ROLE_UPDATE = 'user_update_role';
-export const ROLE_DELETE = 'user_delete_role';
-export const ROLE_GET_ALL = 'user_get_all_roles';
-export const ROLE_GET = 'user_get_role';
+// ROLE
+export const CREATE = 'group_create_grup';
+export const UPDATE = 'group_update_role';
+export const DELETE = 'group_delete_role';
+export const GET_ALL = 'group_get_all_roles';
+export const GET = 'group_get_role';
+export const GET_BY_GROUP = 'group_get_role_by_group';

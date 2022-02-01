@@ -1,5 +1,5 @@
-import { DestroyTokenDto } from './DestroyTokenDto';
-import { DecodeTokenDto } from './DecodeTokenDto';
-import { CreateTokenDto } from './CreateTokenDto';
+import { Destroy } from './Destroy';
+import { Decode } from './Decode';
+import { Create } from './Create';
 
-export { CreateTokenDto, DecodeTokenDto, DestroyTokenDto };
+export { Create, Decode, Destroy };

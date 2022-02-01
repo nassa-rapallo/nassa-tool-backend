@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { RoleProvider } from 'src/providers/role.provider';
-import { RoleController } from 'src/routes/role.controller';
+import { RoleController } from 'src/routes/group/role.controller';
 import { RoleService } from 'src/services/clients/role/role.service';
 import { ConfigService } from 'src/services/config/config.service';
 

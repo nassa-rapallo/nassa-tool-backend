@@ -1,23 +1,21 @@
-import { UpdateUserDto } from './UpdateUserDto';
-import { IsAdminDto } from './IsAdminDto';
-import { UserIdDto } from './UserIdDto';
-import { ForgotPasswordDto } from './ForgotPasswordDto';
-import { CreateUserDto } from './CreateUserDto';
-import { AddRoleDto } from './AddRoleDto';
-import { ChangePasswordDto } from './ChangePasswordDto';
-import { ConfirmUserDto } from './ConfirmUserDto';
-import { UserCredentialsDto } from './UserCredentialsDtro';
-import { DeleteUserDto } from './DeleteUserDto';
+import { Update } from './Update';
+import { Get } from './Get';
+import { ForgotPassword } from './ForgotPassword';
+import { Create } from './Create';
+import { AddRole } from './AddRole';
+import { ChangePassword } from './ChangePassword';
+import { Confirm } from './Confirm';
+import { Credentials } from './Credentials';
+import { Delete } from './Delete';
 
 export {
-  AddRoleDto,
-  ChangePasswordDto,
-  ConfirmUserDto,
-  CreateUserDto,
-  ForgotPasswordDto,
-  UserCredentialsDto,
-  UserIdDto,
-  IsAdminDto,
-  DeleteUserDto,
-  UpdateUserDto,
+  Update,
+  Get,
+  ForgotPassword,
+  Create,
+  Delete,
+  AddRole,
+  ChangePassword,
+  Confirm,
+  Credentials,
 };

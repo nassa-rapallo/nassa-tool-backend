@@ -15,21 +15,29 @@ export class PermissionService {
   /*                                    CRUD                                    */
   /* -------------------------------------------------------------------------- */
 
-  async permissionCreate(data: Dto.CreatePermissionDto): Promise<Responses.PermissionCreated> {
+  async permissionGetAll(): Promise<Responses.GetAll> {
+    return firstValueFrom(this.permissionClient.send<Responses.GetAll>(COMMANDS.GET_ALL, {}));
+  }
+
+  async permissionGet(data: Dto.Get): Promise<Responses.Get> {
+    return firstValueFrom(this.permissionClient.send<Responses.Get, Dto.Get>(COMMANDS.GET, data));
+  }
+
+  async permissionCreate(data: Dto.Create): Promise<Responses.Created> {
     return firstValueFrom(
-      this.permissionClient.send<Responses.PermissionCreated, Dto.CreatePermissionDto>(
-        COMMANDS.PERMISSION_CREATE,
-        data,
-      ),
+      this.permissionClient.send<Responses.Created, Dto.Create>(COMMANDS.CREATE, data),
     );
   }
 
-  async permissionGet(data: Dto.GetPermissionDto): Promise<Responses.PermissionGet> {
+  async permissionUpdate(data: Dto.Update): Promise<Responses.Updated> {
     return firstValueFrom(
-      this.permissionClient.send<Responses.PermissionGet, Dto.GetPermissionDto>(
-        COMMANDS.PERMISSION_GET,
-        data,
-      ),
+      this.permissionClient.send<Responses.Updated, Dto.Update>(COMMANDS.UPDATE, data),
+    );
+  }
+
+  async permissionDelete(data: Dto.Delete): Promise<Responses.Deleted> {
+    return firstValueFrom(
+      this.permissionClient.send<Responses.Deleted, Dto.Delete>(COMMANDS.DELETE, data),
     );
   }
 
@@ -37,14 +45,9 @@ export class PermissionService {
   /*                               FUNCTIONALITIES                              */
   /* -------------------------------------------------------------------------- */
 
-  async permissionIsPermitted(
-    data: Dto.PermissionIsPermittedDto,
-  ): Promise<Responses.PermissionIsPermitted> {
+  async permissionIsPermitted(data: Dto.Permitted): Promise<Responses.Permitted> {
     return firstValueFrom(
-      this.permissionClient.send<Responses.PermissionIsPermitted, Dto.PermissionIsPermittedDto>(
-        COMMANDS.PERMISSION_IS_PERMITTED,
-        data,
-      ),
+      this.permissionClient.send<Responses.Permitted, Dto.Permitted>(COMMANDS.PERMITTED, data),
     );
   }
 }
