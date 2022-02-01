@@ -1,10 +1,10 @@
 import { Provider } from '@nestjs/common';
 import { ClientProxyFactory, Transport } from '@nestjs/microservices';
-import { ROLE_SERVICE } from 'src/services/clients/clientsName';
+import { RULE_SERVICE } from 'src/services/clients/clientsName';
 import { ConfigService } from 'src/services/config/config.service';
 
-export const RoleProvider: Provider = {
-  provide: ROLE_SERVICE,
+export const RuleProvider: Provider = {
+  provide: RULE_SERVICE,
   useFactory: (configService: ConfigService) => {
     const rabbit = configService.get('rabbit');
 
@@ -12,7 +12,7 @@ export const RoleProvider: Provider = {
       transport: Transport.RMQ,
       options: {
         urls: [rabbit.host],
-        queue: rabbit.queues.group,
+        queue: rabbit.queues.permission,
         queueOptions: {
           durable: true,
         },

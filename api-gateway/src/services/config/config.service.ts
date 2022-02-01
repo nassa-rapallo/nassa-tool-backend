@@ -23,6 +23,7 @@ export class ConfigService {
         token: process.env.RABBITMQ_TOKEN_QUEUE_NAME,
         permission: process.env.RABBITMQ_PERMISSION_QUEUE_NAME,
         mailer: process.env.RABBITMQ_MAILER_QUEUE_NAME,
+        group: process.env.RABBITMQ_GROUP_QUEUE_NAME,
       },
     };
   }

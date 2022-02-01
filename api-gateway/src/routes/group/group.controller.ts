@@ -8,7 +8,7 @@ import * as Responses from 'src/modules/group/responses';
 
 @UseInterceptors(ResponseInterceptor)
 @Controller('group')
-export class RoleController {
+export class GroupController {
   constructor(private readonly groupService: GroupService) {}
 
   @Get('/')

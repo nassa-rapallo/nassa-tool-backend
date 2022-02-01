@@ -8,7 +8,7 @@ import * as Responses from 'src/modules/rule/responses';
 
 @UseInterceptors(ResponseInterceptor)
 @Controller('permission/rules')
-export class RoleController {
+export class RuleController {
   constructor(private readonly ruleService: RuleService) {}
 
   @Get('/')
