@@ -10,6 +10,8 @@ export const PASSWORD = 'hunter12';
 export const STATUS = HttpStatus.OK;
 export const MESSAGE = 'user_search_by_id_success';
 export const TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9';
+export const GROUP = 'Parkour Letterario';
+export const CODENAME = 'bookclub';
 
 export const SEND_EMAIL = {
   to: EMAIL,

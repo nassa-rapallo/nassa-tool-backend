@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsString, IsUUID } from 'class-validator';
-import { ACTION, UUID } from 'src/shared/constants/model';
+import { IsDate, IsString, IsUUID } from 'class-validator';
+import { UUID } from 'src/shared/constants/model';
+import { Permission } from './Permission';
 
 export class Rule {
   @ApiProperty({ example: UUID, description: 'ID of the Rule' })
@@ -8,19 +9,22 @@ export class Rule {
   @IsUUID(4, { message: 'id must be an UUID' })
   id: string;
 
-  @ApiProperty({ description: 'Section in which the rule is nested in' })
+  @ApiProperty({ description: 'Group in which the rule is nested in' })
   @IsUUID(4, { message: 'ID must be un UUID' })
-  section: string;
+  groupId: string;
 
-  @ApiProperty({ example: ACTION, description: 'Name of the action' })
-  @IsString()
-  action: string;
-
-  @ApiProperty({
-    example: [UUID, UUID],
-    description: 'Array of the roles ids that can do the action',
-  })
-  @IsArray()
+  @ApiProperty({ description: 'The role cluster for the rule' })
   @IsString({ each: true })
-  roles: string[];
+  cluster: string[];
+
+  @ApiProperty({})
+  permission: Permission;
+
+  @ApiProperty({})
+  @IsDate()
+  createdAt: Date;
+
+  @ApiProperty({})
+  @IsDate()
+  updatedAt: Date;
 }

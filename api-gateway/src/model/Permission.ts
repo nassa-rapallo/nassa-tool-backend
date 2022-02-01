@@ -1,15 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsUUID } from 'class-validator';
-import { UUID } from 'src/shared/constants/model';
+import { IsDate, IsString, IsUUID } from 'class-validator';
+import { ACTION, UUID } from 'src/shared/constants/model';
+import { Rule } from './Rule';
 
 export class Permission {
-  @ApiProperty({
-    example: UUID,
-    description: 'Role related to the new permission',
-  })
+  @ApiProperty({ example: UUID })
   @IsString()
-  @IsUUID(4, { message: 'role must be an UUID' })
-  role: string;
+  @IsUUID(4, { message: 'ID must be an UUID' })
+  id: string;
+
+  @ApiProperty({ example: UUID, description: 'In which section is the permission' })
+  @IsString()
+  section: string;
 
   @ApiProperty({
     example: UUID,
@@ -17,10 +19,30 @@ export class Permission {
   })
   @IsString()
   @IsUUID(4, { message: 'action must be an UUID' })
-  action: string;
+  actionId: string;
 
-  @ApiProperty({ example: UUID, description: 'In which section is the role' })
+  @ApiProperty({
+    example: ACTION,
+    description: 'For which action the role has now permission',
+  })
   @IsString()
-  @IsUUID(4, { message: 'section must be an UUID' })
-  section: string;
+  actionName: string;
+
+  @ApiProperty({
+    example: UUID,
+    description: 'For which action the role has now permission',
+  })
+  @IsString()
+  decription: string;
+
+  @ApiProperty()
+  rules: Rule[];
+
+  @ApiProperty()
+  @IsDate()
+  createdAt: Date;
+
+  @ApiProperty()
+  @IsDate()
+  updatedAt: Date;
 }
