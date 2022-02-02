@@ -1,5 +1,5 @@
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { Controller, HttpStatus, Inject } from '@nestjs/common';
+import { Controller, HttpStatus } from '@nestjs/common';
 import { RuleService } from 'src/services/rule.service';
 
 import * as C from 'src/model/rule/command';
@@ -8,7 +8,7 @@ import { message } from 'src/shared/message';
 
 @Controller()
 export class RuleController {
-  constructor(@Inject() private readonly service: RuleService) {}
+  constructor(private readonly service: RuleService) {}
 
   @MessagePattern(C.CREATE)
   async ruleCreate(@Payload() data: Dto.Create) {

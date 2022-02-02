@@ -1,4 +1,4 @@
-import { Types } from 'src/shared/Types';
+import Types from '../shared/Types';
 import {
   Column,
   CreateDateColumn,
@@ -17,7 +17,7 @@ export class Role {
   @Column({ nullable: false })
   name: string;
 
-  @Column({ nullable: true, type: 'enum', enum: Types })
+  @Column({ nullable: true, type: 'enum', enum: Types, default: Types.NONE })
   type: Types;
 
   @Column('int', { default: 0 })

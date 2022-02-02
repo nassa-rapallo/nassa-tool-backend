@@ -15,7 +15,6 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       migrations: ['dist/migrations/*.js'],
       migrationsRun: true,
       migrationsTableName: 'migrations_history',
-      synchronize: true, // ONLY IN DEV
       autoLoadEntities: true,
     };
   }

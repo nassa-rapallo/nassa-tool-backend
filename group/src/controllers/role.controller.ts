@@ -1,4 +1,4 @@
-import { Controller, HttpStatus, Inject } from '@nestjs/common';
+import { Controller, HttpStatus } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 
 import { RoleService } from 'src/services/role.service';
@@ -12,8 +12,8 @@ import * as Response from 'src/model/role/responses';
 @Controller()
 export class RoleController {
   constructor(
-    @Inject() private readonly service: RoleService,
-    @Inject() private readonly groupService: GroupService,
+    private readonly service: RoleService,
+    private readonly groupService: GroupService,
   ) {}
 
   @MessagePattern(C.GET_ALL)

@@ -12,6 +12,7 @@ services:
       - token
       - mailer
       - permission
+      - group
     ports:
       - "7000:7000"
     volumes:

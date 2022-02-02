@@ -5,11 +5,11 @@ import { UserModule } from './app/user.module';
 import { MailerModule } from './app/mailer.module';
 import { PermissionModule } from './app/permission.module';
 import { RoleModule } from './app/role.module';
-import { SectionModule } from './app/section.module';
 import { TokenModule } from './app/token.module';
 import { HelloModule } from './app/hello.module';
-
 import { GuardsModule } from './app/guards.module';
+import { GroupModule } from './app/group.module';
+import { RuleModule } from './app/rule.module';
 
 @Module({
   imports: [
@@ -17,10 +17,11 @@ import { GuardsModule } from './app/guards.module';
     MailerModule,
     PermissionModule,
     RoleModule,
-    SectionModule,
     TokenModule,
-    HelloModule,
+    GroupModule,
     GuardsModule,
+    RuleModule,
+    HelloModule,
   ],
   providers: [ConfigService],
   exports: [ConfigService],

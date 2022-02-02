@@ -1,6 +1,7 @@
 import { ClientProxy } from '@nestjs/microservices';
 import { Controller, Inject, Get } from '@nestjs/common';
 import {
+  GROUP_SERVICE,
   MAILER_SERVICE,
   PERMISSION_SERVICE,
   TOKEN_SERVICE,
@@ -16,6 +17,7 @@ export class HelloController {
     @Inject(PERMISSION_SERVICE)
     private readonly permissionServiceClient: ClientProxy,
     @Inject(MAILER_SERVICE) private readonly mailerServiceClient: ClientProxy,
+    @Inject(GROUP_SERVICE) private readonly groupServiceClient: ClientProxy,
   ) {}
 
   @Get('/user')
@@ -36,5 +38,10 @@ export class HelloController {
   @Get('/permission')
   async permission(): Promise<string> {
     return firstValueFrom(this.permissionServiceClient.send('hello_permission', {}));
+  }
+
+  @Get('/group')
+  async group(): Promise<string> {
+    return firstValueFrom(this.groupServiceClient.send('hello_group', {}));
   }
 }

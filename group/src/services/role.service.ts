@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { Role } from 'src/entities/role.entity';
 import * as Dto from 'src/model/role/dto';
 import { Group } from 'src/entities/group.entity';
-import { Types } from 'src/shared/Types';
+import Types from 'src/shared/Types';
 
 @Injectable()
 export class RoleService {

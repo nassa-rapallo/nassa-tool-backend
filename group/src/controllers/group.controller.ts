@@ -1,4 +1,4 @@
-import { Controller, Inject, HttpStatus } from '@nestjs/common';
+import { Controller, HttpStatus } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { GroupService } from 'src/services/group.service';
 
@@ -9,7 +9,12 @@ import * as Response from 'src/model/group/responses';
 
 @Controller()
 export class GroupController {
-  constructor(@Inject() private readonly service: GroupService) {}
+  constructor(private readonly service: GroupService) {}
+
+  @MessagePattern('hello_group')
+  async groupHello(): Promise<string> {
+    return 'Hello from Group!';
+  }
 
   @MessagePattern(C.GET_ALL)
   async groupGetAll(): Response.GetAll {

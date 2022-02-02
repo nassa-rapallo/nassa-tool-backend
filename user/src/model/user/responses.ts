@@ -1,5 +1,5 @@
 import { User } from 'src/entities/user.entity';
-import { Response } from 'src/responses/Response';
+import { Response } from 'src/shared/Response';
 
 export type UserLink = Promise<
   Response<{ user: Partial<User> } & { link?: string }>

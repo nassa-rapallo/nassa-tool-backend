@@ -1,22 +1,8 @@
 import { Module } from '@nestjs/common';
-import { PermissionController } from './controllers/permission.controller';
-import { PermissionService } from './services/permission.service';
-import { TypeOrmConfigService } from './services/config/typeorm-config.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { RuleController } from './controllers/rule.controller';
-import { Rule } from './entities/rule.entity';
-import { RuleService } from './services/rule.service';
-import { Permission } from './entities/permission.entity';
 
+import { PermissionModule } from 'src/app/permission.module';
+import { RuleModule } from './app/rule.module';
 @Module({
-  imports: [
-    TypeOrmModule.forRootAsync({
-      useClass: TypeOrmConfigService,
-    }),
-    TypeOrmModule.forFeature([Permission, Rule]),
-  ],
-
-  controllers: [PermissionController, RuleController],
-  providers: [PermissionService, RuleService],
+  imports: [PermissionModule, RuleModule],
 })
-export class PermissionModule {}
+export class Permission {}

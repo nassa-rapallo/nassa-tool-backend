@@ -1,4 +1,4 @@
-import { Controller, HttpStatus, Inject } from '@nestjs/common';
+import { Controller, HttpStatus } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 
 import * as C from 'src/model/permission/command';
@@ -9,7 +9,7 @@ import { message } from 'src/shared/message';
 
 @Controller()
 export class PermissionController {
-  constructor(@Inject() private readonly service: PermissionService) {}
+  constructor(private readonly service: PermissionService) {}
 
   @MessagePattern('hello_permission')
   getHello(): string {

@@ -1,18 +1,7 @@
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
-
-import { TypeOrmConfigService } from './services/config/typeorm-config.service';
-
+import { GroupModule } from './app/group.module';
 
 @Module({
-
-  imports: [
-    TypeOrmModule.forRootAsync({
-      useClass: TypeOrmConfigService,
-    }),
-    TypeOrmModule.forFeature([]),
-  ],
-  controllers: [],
-  providers: [],
+  imports: [GroupModule],
 })
-export class GroupModule {}
+export class Group {}

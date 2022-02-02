@@ -1,4 +1,3 @@
-
 export type RabbitConf = {
   host: string;
   queue: string;
@@ -19,9 +18,8 @@ export class ConfigService {
 
     this.envConfig.rabbit = {
       host: process.env.RABBITMQ_FULL_HOST,
-      queue: process.env.RABBITMQ_USER_QUEUE_NAME,
+      queue: process.env.RABBITMQ_GROUP_QUEUE_NAME,
     };
-
   }
 
   get<ReturnType>(key: keyof EnvConfig): ReturnType {
