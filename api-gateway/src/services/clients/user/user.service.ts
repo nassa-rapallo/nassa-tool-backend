@@ -16,31 +16,31 @@ export class UserService {
   /*                                    CRUD                                    */
   /* -------------------------------------------------------------------------- */
 
-  async userGetAll(): Promise<Responses.UserGetAll> {
-    return firstValueFrom(this.userClient.send<Responses.UserGetAll>(COMMANDS.USER_GET_ALL, {}));
+  async userGetAll(): Promise<Responses.GetAll> {
+    return firstValueFrom(this.userClient.send<Responses.GetAll>(COMMANDS.USER_GET_ALL, {}));
   }
 
-  async userGet(params: Params.UserGet): Promise<Responses.UserGet> {
+  async userGet(params: Params.UserGet): Promise<Responses.Get> {
     return firstValueFrom(
-      this.userClient.send<Responses.UserGet, Dto.UserIdDto>(COMMANDS.USER_GET, params),
+      this.userClient.send<Responses.Get, Params.UserGet>(COMMANDS.USER_GET, params),
     );
   }
 
-  async userCreate(data: Dto.CreateUserDto): Promise<Responses.UserLink> {
+  async userCreate(data: Dto.Create): Promise<Responses.UserLink> {
     return firstValueFrom(
-      this.userClient.send<Responses.UserLink, Dto.CreateUserDto>(COMMANDS.USER_CREATE, data),
+      this.userClient.send<Responses.UserLink, Dto.Create>(COMMANDS.USER_CREATE, data),
     );
   }
 
-  async userDelete(data: Dto.DeleteUserDto): Promise<Responses.UserDelete> {
+  async userDelete(data: Dto.Delete): Promise<Responses.Deleted> {
     return firstValueFrom(
-      this.userClient.send<Responses.UserDelete, Dto.DeleteUserDto>(COMMANDS.USER_DELETE, data),
+      this.userClient.send<Responses.Deleted, Dto.Delete>(COMMANDS.USER_DELETE, data),
     );
   }
 
-  async userUpdate(data: Dto.UpdateUserDto): Promise<Responses.UserUpdate> {
+  async userUpdate(data: Dto.Update): Promise<Responses.Updated> {
     return firstValueFrom(
-      this.userClient.send<Responses.UserUpdate, Dto.UpdateUserDto>(COMMANDS.USER_UPDATE, data),
+      this.userClient.send<Responses.Updated, Dto.Update>(COMMANDS.USER_UPDATE, data),
     );
   }
 
@@ -48,51 +48,45 @@ export class UserService {
   /*                               FUNCTIONALITIES                              */
   /* -------------------------------------------------------------------------- */
 
-  async userGetByCredentials(data: LoginUserDto): Promise<Responses.UserGet> {
+  async userGetByCredentials(data: LoginUserDto): Promise<Responses.Get> {
     return firstValueFrom(
-      this.userClient.send<Responses.UserGet, LoginUserDto>(
-        COMMANDS.USER_SEARCH_BY_CREDENTIALS,
-        data,
-      ),
+      this.userClient.send<Responses.Get, LoginUserDto>(COMMANDS.USER_SEARCH_BY_CREDENTIALS, data),
     );
   }
 
-  async userAddRole(data: Dto.AddRoleDto): Promise<Responses.User> {
+  async userAddRole(data: Dto.AddRole): Promise<Responses.Get> {
     return firstValueFrom(
-      this.userClient.send<Responses.User, Dto.AddRoleDto>(COMMANDS.USER_ADD_ROLE, data),
+      this.userClient.send<Responses.Get, Dto.AddRole>(COMMANDS.USER_ADD_ROLE, data),
     );
   }
 
-  async userConfirm(data: Dto.ConfirmUserDto): Promise<Responses.UserConfirm> {
+  async userConfirm(data: Dto.Confirm): Promise<Responses.Confirm> {
     return firstValueFrom(
-      this.userClient.send<Responses.UserConfirm, Dto.ConfirmUserDto>(
-        COMMANDS.USER_CONFIRM_LINK,
-        data,
-      ),
+      this.userClient.send<Responses.Confirm, Dto.Confirm>(COMMANDS.USER_CONFIRM_LINK, data),
     );
   }
 
-  async userForgotPassword(data: Dto.ForgotPasswordDto): Promise<Responses.UserForgotPassword> {
+  async userForgotPassword(data: Dto.ForgotPassword): Promise<Responses.ForgotPassword> {
     return firstValueFrom(
-      this.userClient.send<Responses.UserForgotPassword, Dto.ForgotPasswordDto>(
+      this.userClient.send<Responses.ForgotPassword, Dto.ForgotPassword>(
         COMMANDS.USER_FORGOT_PASSWORD,
         data,
       ),
     );
   }
 
-  async userChangePassword(data: Dto.ChangePasswordDto): Promise<Responses.UserChangePassword> {
+  async userChangePassword(data: Dto.ChangePassword): Promise<Responses.ChangePassword> {
     return firstValueFrom(
-      this.userClient.send<Responses.UserChangePassword, Dto.ChangePasswordDto>(
+      this.userClient.send<Responses.ChangePassword, Dto.ChangePassword>(
         COMMANDS.USER_CHANGE_PASSWORD,
         data,
       ),
     );
   }
 
-  async userIsAdmin(data: Dto.IsAdminDto): Promise<Responses.UserIsAdmin> {
+  async userIsAdmin(data: { id: string }): Promise<Responses.IsAdmin> {
     return firstValueFrom(
-      this.userClient.send<Responses.UserIsAdmin, Dto.IsAdminDto>(COMMANDS.USER_IS_ADMIN, data),
+      this.userClient.send<Responses.IsAdmin, { id: string }>(COMMANDS.USER_IS_ADMIN, data),
     );
   }
 }

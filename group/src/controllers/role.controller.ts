@@ -52,6 +52,25 @@ export class RoleController {
     };
   }
 
+  @MessagePattern(C.GET_GROUP_TYPE)
+  async roleGetGroupAdmin(data: Dto.RoleGetByType): Response.Get {
+    try {
+      const role = await this.service.roleGetByType(data);
+
+      return {
+        status: HttpStatus.OK,
+        message: message(C.GET_GROUP_TYPE, HttpStatus.OK),
+        data: { role },
+      };
+    } catch {
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        message: message(C.GET_GROUP_TYPE, HttpStatus.BAD_REQUEST),
+        data: undefined,
+      };
+    }
+  }
+
   @MessagePattern(C.GET)
   async roleGet(data: Dto.RoleGet): Response.Get {
     try {

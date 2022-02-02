@@ -23,6 +23,12 @@ export class PermissionService {
     return firstValueFrom(this.permissionClient.send<Responses.Get, Dto.Get>(COMMANDS.GET, data));
   }
 
+  async permissionGetByAction(data: Dto.GetByAction): Promise<Responses.Get> {
+    return firstValueFrom(
+      this.permissionClient.send<Responses.Get, Dto.GetByAction>(COMMANDS.GET_BY_NAME, data),
+    );
+  }
+
   async permissionCreate(data: Dto.Create): Promise<Responses.Created> {
     return firstValueFrom(
       this.permissionClient.send<Responses.Created, Dto.Create>(COMMANDS.CREATE, data),

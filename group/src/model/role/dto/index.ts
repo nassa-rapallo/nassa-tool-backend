@@ -1,3 +1,4 @@
+import { RoleGetGroupType } from './RoleGetGroupType';
 import { RoleGetByType } from './RoleGetByType';
 import { RoleDelete } from './RoleDelete';
 import { RoleUpdate } from './RoleUpdate';
@@ -12,4 +13,5 @@ export {
   RoleUpdate,
   RoleDelete,
   RoleGetByType,
+  RoleGetGroupType,
 };

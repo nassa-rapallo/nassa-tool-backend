@@ -46,4 +46,26 @@ export class LinkController {
       };
     }
   }
+
+  @MessagePattern(C.IS_ADMIN)
+  public async isAdmin(@Payload() data: { id: string }): Response.IsAdmin {
+    try {
+      const user = await this.userService.get({ id: data.id });
+
+      return {
+        status: user.isAdmin ? HttpStatus.OK : HttpStatus.BAD_REQUEST,
+        message: message(
+          C.IS_ADMIN,
+          user.isAdmin ? HttpStatus.OK : HttpStatus.BAD_REQUEST,
+        ),
+        data: { admin: user.isAdmin },
+      };
+    } catch {
+      return {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: message(C.IS_ADMIN, HttpStatus.INTERNAL_SERVER_ERROR),
+        data: undefined,
+      };
+    }
+  }
 }

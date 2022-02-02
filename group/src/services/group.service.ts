@@ -23,6 +23,12 @@ export class GroupService {
     return this.repository.findOneOrFail({ where: { name: data.name } });
   }
 
+  async groupGetByCodename(data: { codeName: string }): Promise<Group> {
+    return this.repository.findOneOrFail({
+      where: { codeName: data.codeName },
+    });
+  }
+
   async groupCreate(data: Dto.GroupCreate): Promise<Group> {
     return this.repository.save(data);
   }

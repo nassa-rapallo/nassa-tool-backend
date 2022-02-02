@@ -1,4 +1,4 @@
-import { GroupRole } from 'src/model/GroupRole';
+import { GroupRole } from '../GroupRole';
 
 export class Permitted {
   actionId: string;

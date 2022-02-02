@@ -8,6 +8,7 @@ export type EnvConfig = {
     host: string;
     queues: RabbitQueue;
   };
+  globalCodename?: string;
 };
 
 export class ConfigService {
@@ -26,6 +27,8 @@ export class ConfigService {
         group: process.env.RABBITMQ_GROUP_QUEUE_NAME,
       },
     };
+
+    this.envConfig.globalCodename = process.env.GLOBAL_CODENAME;
   }
 
   get(key: keyof EnvConfig): any {

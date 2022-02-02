@@ -1,15 +1,10 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { PermissionService } from '../clients/permission/permission.service';
 import { UserService } from '../clients/user/user.service';
 
 @Injectable()
 export class SameUserGuard implements CanActivate {
-  constructor(
-    private readonly reflector: Reflector,
-    private readonly userService: UserService,
-    private readonly permissionService: PermissionService,
-  ) {}
+  constructor(private readonly reflector: Reflector, private readonly userService: UserService) {}
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -22,7 +17,7 @@ export class SameUserGuard implements CanActivate {
 
     if (!data.id || !user) return false;
 
-    const { data: isAdminData } = await this.userService.userIsAdmin({ userId: user.id });
+    const { data: isAdminData } = await this.userService.userIsAdmin({ id: user.id });
 
     // if is a global admin, the user can do whatever they want
     if (isAdminData.admin) return true;
